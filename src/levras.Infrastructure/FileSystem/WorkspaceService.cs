@@ -4,7 +4,7 @@ using levras.Core.Abstractions;
 using levras.Core.Exceptions;
 using levras.Core.Models;
 
-namespace levras.Infrastrucutre.FileService;
+namespace levras.Infrastructure.FileService;
 
 public sealed class WorkspaceService : IWorkspaceService
 {

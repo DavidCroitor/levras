@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using levras.Core.Abstractions;
 using levras.Core.Exceptions;
 
-namespace levras.Infrastrucutre.FileService;
+namespace levras.Infrastructure.FileService;
 
 public sealed class FileSystemService : IFileSystemService
 {

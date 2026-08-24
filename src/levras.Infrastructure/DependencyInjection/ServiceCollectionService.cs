@@ -1,6 +1,6 @@
 
 using levras.Core.Abstractions;
-using levras.Infrastrucutre.FileService;
+using levras.Infrastructure.FileService;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace levras.Infrastructure.DependencyInjection;
