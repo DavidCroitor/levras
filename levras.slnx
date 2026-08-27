@@ -1,5 +1,8 @@
 <Solution>
   <Project Path="src/levras.Core/levras.Core.csproj" />
   <Project Path="src/levras.Infrastructure/levras.Infrastructure.csproj" />
-  <Project Path="src/levras.Presentation/levras.Presentation.csproj" />
+  <Project Startup="true" Path="src/levras.Presentation/levras.Presentation.csproj" />
+
+  <Project Path="tests/levras.Presentation.tests/levras.Presentation.Tests.csproj" />
+  <Project Path="tests/levras.Infrastructure.tests/levras.Infrastructure.Tests.csproj" />
 </Solution>

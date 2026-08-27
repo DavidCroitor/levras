@@ -15,7 +15,6 @@ public partial class EditorViewModel : ViewModelBase
     private readonly IFileSystemService _fileSystemService;
     private readonly IWorkspaceService _workspaceService;
     private readonly IDialogService _dialogService;
-
     public TextDocument Document {get; } = new();
 
     [ObservableProperty]
@@ -76,7 +75,12 @@ public partial class EditorViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task<bool> SaveAsync()
+    private async Task SaveAsync()
+    {
+        await TrySaveInternalAsync();
+    }
+
+    private async Task<bool> TrySaveInternalAsync()
     {
         if(CurrentFilePath is null)
         {
@@ -104,7 +108,7 @@ public partial class EditorViewModel : ViewModelBase
 
         return choice switch
         {
-            SaveChangesChoice.Save => await SaveAsync(),
+            SaveChangesChoice.Save => await TrySaveInternalAsync(),
             SaveChangesChoice.Discard => true,
             SaveChangesChoice.Cancel => false,
             _ => false
