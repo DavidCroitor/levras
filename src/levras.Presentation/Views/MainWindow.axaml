@@ -28,6 +28,15 @@
                       <TreeView.Styles>
                         <Style Selector="TreeViewItem" x:DataType="vm:WorkspaceItemViewModel">
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                            <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem Header="Delete"
+                                            Command="{Binding $parent[TreeView].((vm:MainViewModel)DataContext).Explorer.DeleteFileCommand}"
+                                            CommandParameter="{Binding}" />
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
                         </Style>
                       </TreeView.Styles>
                 <TreeView.ItemTemplate>

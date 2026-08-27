@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using levras.Core.Exceptions;
 using levras.Presentation.Services;
 using Microsoft.VisualBasic;
 
@@ -13,41 +14,68 @@ public partial class MainViewModel : ViewModelBase
     private readonly IFolderPickerService _folderPickerService;
     public WorkspaceExplorerViewModel Explorer {get; }
     public EditorViewModel Editor {get;}
+    public IDialogService _dialogService;
 
     public MainViewModel(
         IFolderPickerService folderPickerService,
         WorkspaceExplorerViewModel explorer,
-        EditorViewModel editor
+        EditorViewModel editor,
+        IDialogService dialogService
     )
     {
+        _dialogService = dialogService;
         _folderPickerService = folderPickerService;
         Explorer = explorer;
         Editor = editor;
 
         Explorer.FileSelected += OnFileSelected;
+        Explorer.FileDeleted += OnFileDeleted;
     }
+
+    private void OnFileDeleted(object? sender, string filePath)
+    {
+        if(filePath == Editor.CurrentFilePath)
+        {
+            Editor.Reset();
+        }
+    }
+
     [RelayCommand]
     private async Task OpenWorkspaceAsync()
     {
-        var folderPath = await _folderPickerService.PickFolderAsync();
-        if (folderPath is null)
+        try
         {
-            return;
+            var folderPath = await _folderPickerService.PickFolderAsync();
+            if (folderPath is null)
+            {
+                return;
+            }
+            await Explorer.LoadWorkspaceAsync(folderPath);
         }
-        await Explorer.LoadWorkspaceAsync(folderPath);
+        catch(WorkspaceIoException ex)
+        {
+            await _dialogService.ShowErrorAsync(ex.Message);
+        }
     }
     
 
     private async void OnFileSelected(object? sender, string filePath)
     {
-        if(filePath == Editor.CurrentFilePath)
+        try
         {
-            return;
+                if(filePath == Editor.CurrentFilePath)
+            {
+                return;
+            }
+            if(!await Editor.TryPrepareToDiscardAsync())
+            {
+                Explorer.RevertSelectionTo(Editor.CurrentFilePath);
+                return;
+            }
         }
-        if(!await Editor.TryPrepareToDiscardAsync())
+        catch(WorkspaceIoException ex)
         {
-            Explorer.RevertSelectionTo(Editor.CurrentFilePath);
-            return;
+            await _dialogService.ShowErrorAsync(ex.Message);
         }
 
         await Editor.LoadFileAsync(filePath);

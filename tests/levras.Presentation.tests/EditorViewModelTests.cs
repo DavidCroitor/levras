@@ -22,7 +22,7 @@ public class EditorViewModelTests
     [Fact]
     public async Task LoadFileAsync_SetsDocumentTextAndClearsIsDirty()
     {
-        _fileSystemService.ReadTextFileAsync("notes.md", Arg.Any<CancellationToken>())
+        _fileSystemService.ReadFileAsync("notes.md", Arg.Any<CancellationToken>())
             .Returns("# Hello");
 
         await _sut.LoadFileAsync("notes.md");
@@ -40,7 +40,7 @@ public class EditorViewModelTests
         await Assert.ThrowsAsync<PathOutsideWorkspaceException>(
             () => _sut.LoadFileAsync("outside.md"));
 
-        await _fileSystemService.DidNotReceive().ReadTextFileAsync(
+        await _fileSystemService.DidNotReceive().ReadFileAsync(
             Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -72,7 +72,7 @@ public class EditorViewModelTests
         var result = await _sut.TryPrepareToDiscardAsync();
 
         Assert.True(result);
-        await _fileSystemService.DidNotReceive().WriteTextFileAsync(
+        await _fileSystemService.DidNotReceive().WriteFileAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -102,7 +102,7 @@ public class EditorViewModelTests
 
         Assert.True(result);
         Assert.False(_sut.IsDirty);
-        await _fileSystemService.Received(1).WriteTextFileAsync(
+        await _fileSystemService.Received(1).WriteFileAsync(
             "notes.md", "unsaved edit", Arg.Any<CancellationToken>());
     }
 
@@ -111,13 +111,13 @@ public class EditorViewModelTests
     {
         await _sut.SaveCommand.ExecuteAsync(null);
 
-        await _fileSystemService.DidNotReceive().WriteTextFileAsync(
+        await _fileSystemService.DidNotReceive().WriteFileAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     private async Task LoadInitialFile()
     {
-        _fileSystemService.ReadTextFileAsync("notes.md", Arg.Any<CancellationToken>())
+        _fileSystemService.ReadFileAsync("notes.md", Arg.Any<CancellationToken>())
             .Returns("initial content");
         await _sut.LoadFileAsync("notes.md");
     }

@@ -57,7 +57,7 @@ public partial class EditorViewModel : ViewModelBase
             throw new PathOutsideWorkspaceException(filePath);
         }
 
-        var content = await _fileSystemService.ReadTextFileAsync(filePath);
+        var content = await _fileSystemService.ReadFileAsync(filePath);
 
         _isLoadingContent = true;
 
@@ -76,8 +76,15 @@ public partial class EditorViewModel : ViewModelBase
 
     [RelayCommand]
     private async Task SaveAsync()
-    {
-        await TrySaveInternalAsync();
+    {   
+        try
+        {
+            await TrySaveInternalAsync();
+        }
+        catch(WorkspaceIoException ex)
+        {
+            await _dialogService.ShowErrorAsync(ex.Message);
+        }
     }
 
     private async Task<bool> TrySaveInternalAsync()
@@ -92,7 +99,7 @@ public partial class EditorViewModel : ViewModelBase
             throw new PathOutsideWorkspaceException(CurrentFilePath);
         }
 
-        await _fileSystemService.WriteTextFileAsync(CurrentFilePath, Document.Text);
+        await _fileSystemService.WriteFileAsync(CurrentFilePath, Document.Text);
         IsDirty = false;
         return true;
     }
@@ -113,5 +120,21 @@ public partial class EditorViewModel : ViewModelBase
             SaveChangesChoice.Cancel => false,
             _ => false
         };
+    }
+
+    public void Reset()
+    {
+        _isLoadingContent = true;
+        try
+        {
+            Document.Text = string.Empty;
+        }
+        finally
+        {
+            _isLoadingContent = false;
+        }
+
+        CurrentFilePath = null;
+        IsDirty = false;
     }
 }

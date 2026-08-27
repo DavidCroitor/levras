@@ -23,7 +23,7 @@ public sealed class FileSystemService : IFileSystemService
         }
     }
 
-    public Task DeleteTextFileAsync(string filePath, CancellationToken cancellationToken = default)
+    public Task DeleteFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -49,7 +49,7 @@ public sealed class FileSystemService : IFileSystemService
         return Task.FromResult(File.Exists(filePath));
     }
 
-    public async Task<string> ReadTextFileAsync(string filePath, CancellationToken cancellationToken = default)
+    public async Task<string> ReadFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -69,7 +69,7 @@ public sealed class FileSystemService : IFileSystemService
         }
     }
 
-    public async Task WriteTextFileAsync(string filePath, string content, CancellationToken cancellationToken = default)
+    public async Task WriteFileAsync(string filePath, string content, CancellationToken cancellationToken = default)
     {
         try
         {

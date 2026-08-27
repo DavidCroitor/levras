@@ -20,6 +20,31 @@ public sealed class DialogService : IDialogService
 
         return await dialog.ShowDialog<SaveChangesChoice>(owner);
     }
+    public async Task<bool> ConfirmAsync(string title, string message)
+    {
+        var owner = GetMainWindow();
+        var dialog = new ConfirmDialog(title, message);
+
+        if(owner is null)
+        {
+            return await dialog.ShowDialog<bool>(new Window());
+        }
+        return await dialog.ShowDialog<bool>(owner);
+
+    }
+    public async Task ShowErrorAsync(string message)
+    {
+        var owner = GetMainWindow();
+        var dialog = new ErrorDialog("Error", message);
+
+        if (owner is null)
+        {
+            await dialog.ShowDialog<bool>(new Window());
+            return;
+        }
+
+        await dialog.ShowDialog<bool>(owner);
+    }
 
     private Window? GetMainWindow()
     {
