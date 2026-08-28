@@ -1,13 +1,18 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Presentation.ViewModels;
-using Presentation.Views;
+using levras.Infrastructure.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using levras.Presentation.ViewModels;
+using levras.Presentation.Views;
+using levras.Presentation.Services;
 
-namespace Presentation;
+namespace levras.Presentation;
 
 public partial class App : Application
 {
+    public IServiceProvider Services {get; private set;} = null!;
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -15,11 +20,19 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        var services = new ServiceCollection();
+        
+        services.AddInfrastructure();
+        services.AddViewModels();
+        services.AddPresentationServices();
+
+        Services = services.BuildServiceProvider();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel(),
+                DataContext = Services.GetRequiredService<MainViewModel>(),
             };
         }
 

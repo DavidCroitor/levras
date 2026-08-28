@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Presentation.ViewModels;
+namespace levras.Presentation.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject
 {

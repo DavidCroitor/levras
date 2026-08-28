@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace Presentation;
+namespace levras.Presentation;
 
 sealed class Program
 {

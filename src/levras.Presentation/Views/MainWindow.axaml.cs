@@ -1,13 +1,12 @@
 using Avalonia.Controls;
 using AvaloniaEdit.Document;
 
-namespace Presentation.Views;
+namespace levras.Presentation.Views;
 
 public partial class MainWindow : Window
 {
     public MainWindow()
     {
         InitializeComponent();
-        
     }
 }
