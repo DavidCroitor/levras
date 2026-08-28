@@ -24,7 +24,7 @@ public partial class App : Application
         
         services.AddInfrastructure();
         services.AddViewModels();
-        services.AddPresentaionServices();
+        services.AddPresentationServices();
 
         Services = services.BuildServiceProvider();
 

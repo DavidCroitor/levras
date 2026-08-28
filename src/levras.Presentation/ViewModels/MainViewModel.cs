@@ -14,7 +14,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly IFolderPickerService _folderPickerService;
     public WorkspaceExplorerViewModel Explorer {get; }
     public EditorViewModel Editor {get;}
-    public IDialogService _dialogService;
+    private readonly IDialogService _dialogService;
 
     public MainViewModel(
         IFolderPickerService folderPickerService,
@@ -78,6 +78,13 @@ public partial class MainViewModel : ViewModelBase
             await _dialogService.ShowErrorAsync(ex.Message);
         }
 
-        await Editor.LoadFileAsync(filePath);
+        try
+        {
+            await Editor.LoadFileAsync(filePath);
+        }
+        catch (WorkspaceIoException ex)
+        {
+            await _dialogService.ShowErrorAsync(ex.Message);
+        }
     }
 }

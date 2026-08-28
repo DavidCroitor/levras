@@ -59,7 +59,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
 
         var confirmed = await _dialogService.ConfirmAsync(
             "Delete File",
-            $"Are you sute you want to delete \"{item.Name}\""
+            $"Are you sure you want to delete \"{item.Name}\"?"
         );
         if(!confirmed)
         {

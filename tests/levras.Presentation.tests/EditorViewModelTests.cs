@@ -4,7 +4,7 @@ using NSubstitute;
 using levras.Presentation.Services;
 using levras.Presentation.ViewModels;
 
-namespace MarkdownEditor.Presentation.Tests;
+namespace levras.Presentation.Tests;
 
 public class EditorViewModelTests
 {
