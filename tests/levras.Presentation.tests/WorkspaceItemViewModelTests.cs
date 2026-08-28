@@ -1,4 +1,4 @@
-using levras.Core.Models;
+using levras.Core.Domain;
 using levras.Presentation.ViewModels;
 
 namespace levras.Presentation.Tests;

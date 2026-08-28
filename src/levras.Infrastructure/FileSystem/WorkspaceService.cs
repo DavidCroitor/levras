@@ -2,7 +2,7 @@ using System.Data.Common;
 using System.Runtime.CompilerServices;
 using levras.Core.Abstractions;
 using levras.Core.Exceptions;
-using levras.Core.Models;
+using levras.Core.Domain;
 
 namespace levras.Infrastructure.FileSystem;
 

@@ -1,5 +1,5 @@
 using levras.Core.Abstractions;
-using levras.Core.Models;
+using levras.Core.Domain;
 using NSubstitute;
 using levras.Presentation.Services;
 using levras.Presentation.ViewModels;

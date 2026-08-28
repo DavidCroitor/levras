@@ -1,4 +1,4 @@
-using levras.Core.Models;
+using levras.Core.Domain;
 
 namespace levras.Core.Abstractions;
 
