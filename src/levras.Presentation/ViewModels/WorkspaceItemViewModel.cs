@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,7 +16,7 @@ public partial class WorkspaceItemViewModel : ViewModelBase
     public string FullPath {get; }
     public bool IsDirectory {get;}
     public bool IsTextFile => !IsDirectory && TextFileExtensions.Contains(Path.GetExtension(FullPath));
-    public List<WorkspaceItemViewModel> Children {get; }
+    public ObservableCollection<WorkspaceItemViewModel> Children {get; }
 
     [ObservableProperty]
     private bool _isSelected;
@@ -28,7 +29,7 @@ public partial class WorkspaceItemViewModel : ViewModelBase
         Name = item.Name;
         FullPath = item.FullPath;
         IsDirectory = item.IsDirectory;
-        Children = item.Children.Select(child => new WorkspaceItemViewModel(child)).ToList();
+        Children = new ObservableCollection<WorkspaceItemViewModel> (item.Children.Select(child => new WorkspaceItemViewModel(child)));
     }
     partial void OnIsSelectedChanged(bool value)
     {

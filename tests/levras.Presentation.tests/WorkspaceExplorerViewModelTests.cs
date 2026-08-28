@@ -83,4 +83,25 @@ public class WorkspaceExplorerViewModelTests
         await _dialogService.Received(1).ShowErrorAsync(Arg.Any<string>());
         Assert.Contains(item, _sut.RootItems); // tree unchanged since deletion failed
     }
+    [Fact]
+    public async Task DeleteFileCommand_WithNestedFile_RemovesFromParentsChildrenCollection()
+    {
+        var tree = new List<WorkspaceItem>
+        {
+            new("SubFolder", "/workspace/SubFolder", IsDirectory: true, Children:
+            [
+                new("nested.md", "/workspace/SubFolder/nested.md", IsDirectory: false, Children: [])
+            ])
+        };
+        _workspaceService.GetWorkspaceTreeAsync(Arg.Any<CancellationToken>()).Returns(tree);
+        await _sut.LoadWorkspaceAsync("/workspace");
+
+        var folder = _sut.RootItems.Single();
+        var nestedFile = folder.Children.Single();
+        _dialogService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+
+        await _sut.DeleteFileCommand.ExecuteAsync(nestedFile);
+
+        Assert.Empty(folder.Children);
+    }
 }

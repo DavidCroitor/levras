@@ -98,8 +98,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
     {
         foreach (var node in nodes)
         {
-            if (node.Children is List<WorkspaceItemViewModel> mutableChildren
-                && mutableChildren.Remove(target))
+            if (node.Children.Remove(target))
             {
                 return true;
             }
