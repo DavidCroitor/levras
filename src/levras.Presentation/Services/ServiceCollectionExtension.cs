@@ -8,6 +8,7 @@ public static class ServiceCollectionExtension
     {
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<IFolderPickerService, FolderPickerService>();
+        services.AddSingleton<ITabFactory, TabFactory>();
         return services;
     }
 }

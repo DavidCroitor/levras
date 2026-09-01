@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:levras.Presentation.ViewModels"
+             xmlns:AvaloniaEdit="using:AvaloniaEdit"
+             x:Class="levras.Presentation.Views.TextEditorTabView"
+             x:DataType="vm:TextEditorTabViewModel">
+
+    <AvaloniaEdit:TextEditor Document="{Binding Document}"
+                              FontFamily="Consolas,Menlo,monospace"
+                              FontSize="14"
+                              ShowLineNumbers="True" />
+</UserControl>

@@ -57,7 +57,7 @@ public partial class TextEditorTabViewModel : TabViewModelBase
     }
 
     [RelayCommand]
-    private async Task SaveAsync()
+    public async Task SaveAsync()
     {   
         try
         {
@@ -88,7 +88,7 @@ public partial class TextEditorTabViewModel : TabViewModelBase
             return true;
         }
 
-        var choice = await _dialogService.ConfirmSaveChangesAsync(FilePath);
+        var choice = await _dialogService.ConfirmSaveChangesAsync(Path.GetFileName(FilePath));
 
         return choice switch
         {

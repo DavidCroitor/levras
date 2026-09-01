@@ -8,40 +8,26 @@ namespace levras.Presentation.Tests;
 
 public class EditorViewModelTests
 {
-    private readonly IFileSystemService _fileSystemService = Substitute.For<IFileSystemService>();
     private readonly IWorkspaceService _workspaceService = Substitute.For<IWorkspaceService>();
     private readonly IDialogService _dialogService = Substitute.For<IDialogService>();
     private readonly TextEditorTabViewModel _sut;
 
     public EditorViewModelTests()
     {
-        _workspaceService.IsPathWithinWorkspace(Arg.Any<string>()).Returns(true);
-        _sut = new EditorViewModel(_fileSystemService, _workspaceService, _dialogService);
+        _sut = new TextEditorTabViewModel("notes.md", _workspaceService, _dialogService);
     }
 
     [Fact]
     public async Task LoadFileAsync_SetsDocumentTextAndClearsIsDirty()
     {
-        _fileSystemService.ReadFileAsync("notes.md", Arg.Any<CancellationToken>())
+        _workspaceService.ReadFileAsync("notes.md", Arg.Any<CancellationToken>())
             .Returns("# Hello");
 
-        await _sut.LoadFileAsync("notes.md");
+        await _sut.LoadFileAsync();
 
         Assert.Equal("# Hello", _sut.Document.Text);
         Assert.False(_sut.IsDirty);
-        Assert.Equal("notes.md", _sut.CurrentFilePath);
-    }
-
-    [Fact]
-    public async Task LoadFileAsync_WithPathOutsideWorkspace_ThrowsAndDoesNotCallFileSystem()
-    {
-        _workspaceService.IsPathWithinWorkspace("outside.md").Returns(false);
-
-        await Assert.ThrowsAsync<PathOutsideWorkspaceException>(
-            () => _sut.LoadFileAsync("outside.md"));
-
-        await _fileSystemService.DidNotReceive().ReadFileAsync(
-            Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Assert.Equal("notes.md", _sut.FilePath);
     }
 
     [Fact]
@@ -72,7 +58,7 @@ public class EditorViewModelTests
         var result = await _sut.TryPrepareToDiscardAsync();
 
         Assert.True(result);
-        await _fileSystemService.DidNotReceive().WriteFileAsync(
+        await _workspaceService.DidNotReceive().WriteFileAsync(
             Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
@@ -102,23 +88,27 @@ public class EditorViewModelTests
 
         Assert.True(result);
         Assert.False(_sut.IsDirty);
-        await _fileSystemService.Received(1).WriteFileAsync(
+        await _workspaceService.Received(1).WriteFileAsync(
             "notes.md", "unsaved edit", Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task SaveAsync_WithNoFileLoaded_ReturnsFalseAndDoesNotCallFileSystem()
+    public async Task SaveAsync_WritesFileAndClearsIsDirty()
     {
+        await LoadInitialFile();
+        _sut.Document.Text = "new content";
+
         await _sut.SaveCommand.ExecuteAsync(null);
 
-        await _fileSystemService.DidNotReceive().WriteFileAsync(
-            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        Assert.False(_sut.IsDirty);
+        await _workspaceService.Received(1).WriteFileAsync(
+            "notes.md", "new content", Arg.Any<CancellationToken>());
     }
 
     private async Task LoadInitialFile()
     {
-        _fileSystemService.ReadFileAsync("notes.md", Arg.Any<CancellationToken>())
+        _workspaceService.ReadFileAsync("notes.md", Arg.Any<CancellationToken>())
             .Returns("initial content");
-        await _sut.LoadFileAsync("notes.md");
+        await _sut.LoadFileAsync();
     }
 }

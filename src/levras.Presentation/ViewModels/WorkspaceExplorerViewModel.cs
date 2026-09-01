@@ -126,7 +126,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         {
             return;
         }
-        if(!node.IsTextFile)
+        if(!node.IsTextFile && !node.IsImageFile)
         {
             return;
         }

@@ -78,4 +78,11 @@ public partial class MainViewModel : ViewModelBase
         OpenTabs.Remove(tab);
         if (SelectedTab == tab) SelectedTab = OpenTabs.LastOrDefault();
     }   
+
+    [RelayCommand]
+    private async Task SaveActiveTabAsync()
+    {
+        if (SelectedTab is TextEditorTabViewModel textTab)
+            await textTab.SaveAsync();
+    }
 }
