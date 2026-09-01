@@ -14,11 +14,12 @@ public interface IFileSystemService
     Task DeleteFileAsync(
 			string filePath, CancellationToken 
 			cancellationToken = default);
+    Task DeleteDirectoryAsync(
+            string path,
+            CancellationToken cancellationToken = default);
     Task<bool> FileExistsAsync(string filePath);
-    Task<WorkspaceItem> CreateDirectoryAsync(
-			string path,
-			CancellationToken cancellationToken = default);
     Task<bool> DirectoryExistsAsync(string path);
+    Task CreateDirectoryAsync(string path);
     Task MoveFileAsync(
             string sourceFilePath, 
             string destinationFilePath, 

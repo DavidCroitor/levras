@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using levras.Core.Abstractions;
+using levras.Core.Domain;
 using levras.Core.Exceptions;
 
 namespace levras.Infrastructure.FileSystem;
@@ -23,6 +24,24 @@ public sealed class FileSystemService : IFileSystemService
         }
     }
 
+    public Task DeleteDirectoryAsync(string path, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            Directory.Delete(path, recursive: true);
+            return Task.CompletedTask;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            throw new AccessDeniedException(path, ex);
+        }
+        catch (IOException ex)
+        {
+            throw new WorkspaceIoFailureException(path, ex);
+        }
+        
+    }
+
     public Task DeleteFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         try
@@ -44,9 +63,34 @@ public sealed class FileSystemService : IFileSystemService
         }
     }
 
-    public Task<bool> FileExistsAsync(string filePath)
+    public Task<bool> DirectoryExistsAsync(string path) => Task.FromResult(Directory.Exists(path));
+
+    public Task<bool> FileExistsAsync(string filePath) => Task.FromResult(File.Exists(filePath));
+
+    public Task MoveDirectoryAsync(string sourceDirectoryPath, string destinationDirectoryPath, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(File.Exists(filePath));
+        try
+        {
+            Directory.Move(sourceDirectoryPath, destinationDirectoryPath);
+            return Task.CompletedTask;
+        }
+        catch (IOException ex)
+        {
+            throw new InvalidMoveException(sourceDirectoryPath, destinationDirectoryPath, ex);
+        }
+    }
+
+    public Task MoveFileAsync(string sourceFilePath, string destinationFilePath, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            File.Move(sourceFilePath, destinationFilePath);
+            return Task.CompletedTask;
+        }
+        catch (IOException ex)
+        {
+            throw new InvalidMoveException(sourceFilePath, destinationFilePath, ex);
+        }
     }
 
     public async Task<string> ReadFileAsync(string filePath, CancellationToken cancellationToken = default)
@@ -88,4 +132,5 @@ public sealed class FileSystemService : IFileSystemService
             throw new WorkspaceIoFailureException(filePath, ex);
         }
     }
+
 }

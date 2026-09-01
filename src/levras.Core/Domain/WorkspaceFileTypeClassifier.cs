@@ -12,9 +12,10 @@ public static class WorkspaceFileTypeClassifier
     {
         if(item.IsDirectory) return WorkspaceFileType.Directory;
 
-        var ext = Path.GetFullPath(item.FullPath);
+        var ext = Path.GetExtension(item.FullPath);
         if(MarkdownExtensions.Contains(ext)) return WorkspaceFileType.Markdown;
         if(ImageExtensions.Contains(ext)) return WorkspaceFileType.Image;
         return WorkspaceFileType.Unsupported;
     }
+    public static bool IsAllowedExtension(string extension) => MarkdownExtensions.Contains(extension) || ImageExtensions.Contains(extension);
 }
