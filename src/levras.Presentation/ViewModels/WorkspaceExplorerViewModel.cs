@@ -21,7 +21,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
 
     public ObservableCollection<WorkspaceItemViewModel> RootItems { get; } = new();
 
-    public event EventHandler<string>? FileSelected;
+    public event EventHandler<WorkspaceItemViewModel>? FileSelected;
     public event EventHandler<string>? FileDeleted;
 
     public WorkspaceExplorerViewModel(
@@ -93,8 +93,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         RemoveFromChildren(RootItems, item);
     }
 
-    private static bool RemoveFromChildren(
-        IEnumerable<WorkspaceItemViewModel> nodes, WorkspaceItemViewModel target)
+    private static bool RemoveFromChildren(IEnumerable<WorkspaceItemViewModel> nodes, WorkspaceItemViewModel target)
     {
         foreach (var node in nodes)
         {
@@ -135,7 +134,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         SetSyncedSelection(false); 
         _currentlySelected = node;
 
-        FileSelected?.Invoke(this, node.FullPath);
+        FileSelected?.Invoke(this, node);
     }
 
     public void RevertSelectionTo(string? filePath)
@@ -153,8 +152,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         finally { _isSyncingSelection = false; }
     }
 
-    private static WorkspaceItemViewModel? FindItemByPath(
-        IEnumerable<WorkspaceItemViewModel> items, string filePath)
+    private static WorkspaceItemViewModel? FindItemByPath(IEnumerable<WorkspaceItemViewModel> items, string filePath)
     {
         foreach (var item in items)
         {

@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<MainViewModel>();
         services.AddTransient<WorkspaceExplorerViewModel>();
-        services.AddTransient<EditorViewModel>();
+        services.AddTransient<TextEditorTabViewModel>();
         return services;
     }
 }

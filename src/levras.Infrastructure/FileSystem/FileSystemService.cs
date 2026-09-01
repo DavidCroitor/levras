@@ -113,6 +113,18 @@ public sealed class FileSystemService : IFileSystemService
         }
     }
 
+    public async Task<byte[]> ReadFileBytesAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        try
+    {
+        return await File.ReadAllBytesAsync(filePath, cancellationToken);
+    }
+    catch (IOException ex)
+    {
+        throw new WorkspaceIoFailureException(filePath, ex);
+    }
+    }
+
     public async Task WriteFileAsync(string filePath, string content, CancellationToken cancellationToken = default)
     {
         try

@@ -11,7 +11,7 @@ public class EditorViewModelTests
     private readonly IFileSystemService _fileSystemService = Substitute.For<IFileSystemService>();
     private readonly IWorkspaceService _workspaceService = Substitute.For<IWorkspaceService>();
     private readonly IDialogService _dialogService = Substitute.For<IDialogService>();
-    private readonly EditorViewModel _sut;
+    private readonly TextEditorTabViewModel _sut;
 
     public EditorViewModelTests()
     {

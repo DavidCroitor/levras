@@ -7,6 +7,9 @@ public interface IFileSystemService
     Task<string> ReadFileAsync(
 			string filePath, 
 			CancellationToken cancellationToken = default);
+        Task<byte[]> ReadFileBytesAsync(
+                        string filePath, 
+                        CancellationToken cancellationToken = default);
     Task WriteFileAsync(
 			string filePath, 
 			string content, 

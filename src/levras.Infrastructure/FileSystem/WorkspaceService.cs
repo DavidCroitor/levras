@@ -71,6 +71,14 @@ public sealed class WorkspaceService : IWorkspaceService
         }
     }
 
+    public Task<byte[]> ReadFileBytesAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        if(!IsPathWithinWorkspace(filePath))
+        {
+            throw new PathOutsideWorkspaceException(filePath);
+        }
+        return _fileSystemService.ReadFileBytesAsync(filePath, cancellationToken);
+    }
     public async Task WriteFileAsync(string filePath, string content, CancellationToken cancellationToken = default)
     {
         if(!IsPathWithinWorkspace(filePath))
@@ -267,4 +275,5 @@ public sealed class WorkspaceService : IWorkspaceService
         var extension = Path.GetExtension(entryPath);
         return WorkspaceFileTypeClassifier.IsAllowedExtension(extension);
     }
+
 }

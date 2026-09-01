@@ -10,12 +10,11 @@ namespace levras.Presentation.ViewModels;
 
 public partial class WorkspaceItemViewModel : ViewModelBase
 {
-    private static readonly HashSet<string> TextFileExtensions =
-        new(StringComparer.OrdinalIgnoreCase) { ".md", ".markdown" };
     public string Name {get; }
     public string FullPath {get; }
     public bool IsDirectory {get;}
-    public bool IsTextFile => !IsDirectory && TextFileExtensions.Contains(Path.GetExtension(FullPath));
+    public bool IsTextFile {get; }
+    public bool IsImageFile {get; }
     public ObservableCollection<WorkspaceItemViewModel> Children {get; }
 
     [ObservableProperty]
@@ -30,6 +29,9 @@ public partial class WorkspaceItemViewModel : ViewModelBase
         FullPath = item.FullPath;
         IsDirectory = item.IsDirectory;
         Children = new ObservableCollection<WorkspaceItemViewModel> (item.Children.Select(child => new WorkspaceItemViewModel(child)));
+
+        IsTextFile = WorkspaceFileTypeClassifier.Classify(item) == WorkspaceFileType.Markdown;
+        IsImageFile = WorkspaceFileTypeClassifier.Classify(item) == WorkspaceFileType.Image;
     }
     partial void OnIsSelectedChanged(bool value)
     {

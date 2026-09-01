@@ -1,5 +1,7 @@
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,33 +13,43 @@ namespace levras.Presentation.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    private readonly IFolderPickerService _folderPickerService;
-    public WorkspaceExplorerViewModel Explorer {get; }
-    public EditorViewModel Editor {get;}
+    private readonly ITabFactory _tabFactory;
     private readonly IDialogService _dialogService;
+    private readonly IFolderPickerService _folderPickerService;
+    public WorkspaceExplorerViewModel Explorer { get; }
+    public ObservableCollection<TabViewModelBase> OpenTabs { get; } = new();
+    [ObservableProperty] private TabViewModelBase? _selectedTab;
 
     public MainViewModel(
-        IFolderPickerService folderPickerService,
-        WorkspaceExplorerViewModel explorer,
-        EditorViewModel editor,
-        IDialogService dialogService
-    )
+            WorkspaceExplorerViewModel explorer,
+            IDialogService dialogService, 
+            IFolderPickerService folderPickerService,
+            ITabFactory tabFactory)
     {
+        Explorer = explorer;
+        _tabFactory = tabFactory;
         _dialogService = dialogService;
         _folderPickerService = folderPickerService;
-        Explorer = explorer;
-        Editor = editor;
-
         Explorer.FileSelected += OnFileSelected;
         Explorer.FileDeleted += OnFileDeleted;
     }
 
-    private void OnFileDeleted(object? sender, string filePath)
+    private void OnFileDeleted(object? sender, string deletedPath)
     {
-        if(filePath == Editor.CurrentFilePath)
-        {
-            Editor.Reset();
-        }
+        var tab = OpenTabs.FirstOrDefault(t => t.FilePath == deletedPath);
+        if (tab is null) return;
+        OpenTabs.Remove(tab);
+        if (SelectedTab == tab) SelectedTab = OpenTabs.LastOrDefault();
+    }
+
+    private async void OnFileSelected(object? sender, WorkspaceItemViewModel node)
+    {
+        var existing = OpenTabs.FirstOrDefault(t => t.FilePath == node.FullPath);
+        if (existing is not null) { SelectedTab = existing; return; }
+
+        var tab = await _tabFactory.CreateTabAsync(node);
+        OpenTabs.Add(tab);
+        SelectedTab = tab;
     }
 
     [RelayCommand]
@@ -57,34 +69,13 @@ public partial class MainViewModel : ViewModelBase
             await _dialogService.ShowErrorAsync(ex.Message);
         }
     }
-    
-
-    private async void OnFileSelected(object? sender, string filePath)
+    [RelayCommand]
+    private async Task CloseTabAsync(TabViewModelBase tab)
     {
-        try
-        {
-                if(filePath == Editor.CurrentFilePath)
-            {
-                return;
-            }
-            if(!await Editor.TryPrepareToDiscardAsync())
-            {
-                Explorer.RevertSelectionTo(Editor.CurrentFilePath);
-                return;
-            }
-        }
-        catch(WorkspaceIoException ex)
-        {
-            await _dialogService.ShowErrorAsync(ex.Message);
-        }
+        if (tab is TextEditorTabViewModel { IsDirty: true } editorTab && !await editorTab.TryPrepareToDiscardAsync())
+            return;
 
-        try
-        {
-            await Editor.LoadFileAsync(filePath);
-        }
-        catch (WorkspaceIoException ex)
-        {
-            await _dialogService.ShowErrorAsync(ex.Message);
-        }
-    }
+        OpenTabs.Remove(tab);
+        if (SelectedTab == tab) SelectedTab = OpenTabs.LastOrDefault();
+    }   
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,31 +11,21 @@ using levras.Presentation.Services;
 
 namespace levras.Presentation.ViewModels;
 
-public partial class EditorViewModel : ViewModelBase
+public partial class TextEditorTabViewModel : TabViewModelBase
 {
-    private readonly IFileSystemService _fileSystemService;
     private readonly IWorkspaceService _workspaceService;
     private readonly IDialogService _dialogService;
     public TextDocument Document {get; } = new();
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CurrentFileName))]
-    private string? _currentFilePath;
-    [ObservableProperty]
-    private bool _isDirty;
-
+    [ObservableProperty]private bool _isDirty;
     private bool _isLoadingContent;
 
-    
-    public string CurrentFileName => CurrentFilePath is null ? "Untitled" : Path.GetFileName(CurrentFilePath);
-
-    public EditorViewModel(
-        IFileSystemService fileSystemService,
+    public TextEditorTabViewModel(
+        string filePath,
         IWorkspaceService workspaceService,
         IDialogService dialogService
-    )
+    ) : base( filePath, Path.GetFileName(filePath))
     {
-        _fileSystemService = fileSystemService;
         _workspaceService = workspaceService;
         _dialogService = dialogService;
 
@@ -50,17 +41,10 @@ public partial class EditorViewModel : ViewModelBase
         IsDirty = true;
     }
 
-    public async Task LoadFileAsync(string filePath)
+    public async Task LoadFileAsync(CancellationToken cancellationToken = default )
     {
-        if(!_workspaceService.IsPathWithinWorkspace(filePath))
-        {
-            throw new PathOutsideWorkspaceException(filePath);
-        }
-
-        var content = await _fileSystemService.ReadFileAsync(filePath);
-
         _isLoadingContent = true;
-
+        var content = await _workspaceService.ReadFileAsync(FilePath);
         try
         {
             Document.Text = content;
@@ -69,8 +53,6 @@ public partial class EditorViewModel : ViewModelBase
         {
             _isLoadingContent = false;
         }
-
-        CurrentFilePath = filePath;
         IsDirty = false;
     }
 
@@ -89,17 +71,12 @@ public partial class EditorViewModel : ViewModelBase
 
     private async Task<bool> TrySaveInternalAsync()
     {
-        if(CurrentFilePath is null)
+        if(FilePath is null)
         {
             return false;
         }
 
-        if(!_workspaceService.IsPathWithinWorkspace(CurrentFilePath))
-        {
-            throw new PathOutsideWorkspaceException(CurrentFilePath);
-        }
-
-        await _fileSystemService.WriteFileAsync(CurrentFilePath, Document.Text);
+        await _workspaceService.WriteFileAsync(FilePath, Document.Text);
         IsDirty = false;
         return true;
     }
@@ -111,7 +88,7 @@ public partial class EditorViewModel : ViewModelBase
             return true;
         }
 
-        var choice = await _dialogService.ConfirmSaveChangesAsync(CurrentFileName);
+        var choice = await _dialogService.ConfirmSaveChangesAsync(FilePath);
 
         return choice switch
         {
@@ -120,21 +97,5 @@ public partial class EditorViewModel : ViewModelBase
             SaveChangesChoice.Cancel => false,
             _ => false
         };
-    }
-
-    public void Reset()
-    {
-        _isLoadingContent = true;
-        try
-        {
-            Document.Text = string.Empty;
-        }
-        finally
-        {
-            _isLoadingContent = false;
-        }
-
-        CurrentFilePath = null;
-        IsDirty = false;
     }
 }
