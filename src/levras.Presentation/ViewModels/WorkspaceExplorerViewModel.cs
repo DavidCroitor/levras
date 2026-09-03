@@ -26,7 +26,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
     public ObservableCollection<WorkspaceItemViewModel> RootItems { get; } = new();
 
     public event EventHandler<WorkspaceItemViewModel>? FileSelected;
-    public event EventHandler<string>? FileDeleted;
+    public event EventHandler<string>? NodeDeleted;
     public event EventHandler<(string oldPath, string newPath)>? NodePathChanged;
 
     public WorkspaceExplorerViewModel(
@@ -55,16 +55,17 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task DeleteFileAsync(WorkspaceItemViewModel? item)
+    public async Task DeleteNodeAsync(WorkspaceItemViewModel? item)
     {
-        if (item is null || item.IsDirectory)
+        if (item is null)
         {
             return;
         }
 
         var confirmed = await _dialogService.ConfirmAsync(
-            "Delete File",
-            $"Are you sure you want to delete \"{item.Name}\"?"
+            item.IsDirectory ?   "Delete Folder" : "Delete File",
+            item.IsDirectory ?  $"Are you sure you want to delete \"{item.Name}\" and everything inside?" :
+                                $"Are you sure you want to delete \"{item.Name}\"?"
         );
         if(!confirmed)
         {
@@ -77,10 +78,16 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
                 throw new PathOutsideWorkspaceException(item.FullPath);
             }
 
-            await _fileSystemService.DeleteFileAsync(item.FullPath);
-
+            if(item.IsDirectory)
+            {
+                await _fileSystemService.DeleteDirectoryAsync(item.FullPath);
+            }
+            else
+            {
+                await _fileSystemService.DeleteFileAsync(item.FullPath);
+            }
             RemoveFromTree(item);
-            FileDeleted?.Invoke(this, item.FullPath);
+            NodeDeleted?.Invoke(this, item.FullPath);
         }
         catch(WorkspaceIoException ex)
         {

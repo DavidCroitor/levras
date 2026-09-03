@@ -32,7 +32,7 @@ public partial class MainViewModel : ViewModelBase
         _dialogService = dialogService;
         _folderPickerService = folderPickerService;
         Explorer.FileSelected += OnFileSelected;
-        Explorer.FileDeleted += OnFileDeleted;
+        Explorer.NodeDeleted += OnNodeDeleted;
         Explorer.NodePathChanged += OnNodePathChanged;
     }
 
@@ -52,12 +52,21 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    private void OnFileDeleted(object? sender, string deletedPath)
+    private void OnNodeDeleted(object? sender, string deletedPath)
     {
-        var tab = OpenTabs.FirstOrDefault(t => t.FilePath == deletedPath);
-        if (tab is null) return;
-        OpenTabs.Remove(tab);
-        if (SelectedTab == tab) SelectedTab = OpenTabs.LastOrDefault();
+        var directoryPrefix = deletedPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        var deletedTabs = OpenTabs.Where(
+            tab =>  tab.FilePath == deletedPath ||
+                    tab.FilePath.StartsWith(directoryPrefix, StringComparison.Ordinal)
+            ).ToList();
+
+        foreach(var tab in deletedTabs)
+            OpenTabs.Remove(tab);
+            
+        if(SelectedTab is not null && !OpenTabs.Contains(SelectedTab))
+        {
+            SelectedTab = OpenTabs.LastOrDefault();
+        }
     }
 
     private async void OnFileSelected(object? sender, WorkspaceItemViewModel node)

@@ -38,7 +38,7 @@ public class WorkspaceExplorerViewModelTests
         var item = await LoadSingleFileWorkspaceAsync();
         _dialogService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
-        await _sut.DeleteFileCommand.ExecuteAsync(item);
+        await _sut.DeleteNodeCommand.ExecuteAsync(item);
 
         await _fileSystemService.Received(1).DeleteFileAsync(item.FullPath, Arg.Any<CancellationToken>());
         Assert.DoesNotContain(item, _sut.RootItems);
@@ -50,7 +50,7 @@ public class WorkspaceExplorerViewModelTests
         var item = await LoadSingleFileWorkspaceAsync();
         _dialogService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
-        await _sut.DeleteFileCommand.ExecuteAsync(item);
+        await _sut.DeleteNodeCommand.ExecuteAsync(item);
 
         await _fileSystemService.DidNotReceive().DeleteFileAsync(
             Arg.Any<string>(), Arg.Any<CancellationToken>());
@@ -63,9 +63,9 @@ public class WorkspaceExplorerViewModelTests
         var item = await LoadSingleFileWorkspaceAsync();
         _dialogService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
         string? raisedPath = null;
-        _sut.FileDeleted += (_, path) => raisedPath = path;
+        _sut.NodeDeleted += (_, path) => raisedPath = path;
 
-        await _sut.DeleteFileCommand.ExecuteAsync(item);
+        await _sut.DeleteNodeCommand.ExecuteAsync(item);
 
         Assert.Equal(item.FullPath, raisedPath);
     }
@@ -78,7 +78,7 @@ public class WorkspaceExplorerViewModelTests
         _fileSystemService.DeleteFileAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns<Task>(_ => throw new Core.Exceptions.AccessDeniedException(item.FullPath));
 
-        await _sut.DeleteFileCommand.ExecuteAsync(item);
+        await _sut.DeleteNodeCommand.ExecuteAsync(item);
 
         await _dialogService.Received(1).ShowErrorAsync(Arg.Any<string>());
         Assert.Contains(item, _sut.RootItems); // tree unchanged since deletion failed
@@ -100,7 +100,7 @@ public class WorkspaceExplorerViewModelTests
         var nestedFile = folder.Children.Single();
         _dialogService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
-        await _sut.DeleteFileCommand.ExecuteAsync(nestedFile);
+        await _sut.DeleteNodeCommand.ExecuteAsync(nestedFile);
 
         Assert.Empty(folder.Children);
     }

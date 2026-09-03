@@ -30,7 +30,7 @@
                                           Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).BeginRenameCommand}"
                                           CommandParameter="{Binding}" />
                                 <MenuItem Header="Delete"
-                                          Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).DeleteFileCommand}"
+                                          Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).DeleteNodeCommand}"
                                           CommandParameter="{Binding}" />
                             </ContextMenu>
                         </Setter.Value>
