@@ -10,12 +10,13 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
+            <MenuItem Header="_Workspace">
                 <MenuItem Header="_Open Workspace..."
                           Command="{Binding OpenWorkspaceCommand}" />
                 <Separator />
                 <MenuItem Header="_Save"
-                          Command="{Binding SaveActiveTabCommand}" />
+                          Command="{Binding SaveActiveTabCommand}"
+                          IsVisible="{Binding OpenTabs.Count}"/>
             </MenuItem>
         </Menu>
         <Grid ColumnDefinitions="260,4,*">
