@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,6 +33,23 @@ public partial class MainViewModel : ViewModelBase
         _folderPickerService = folderPickerService;
         Explorer.FileSelected += OnFileSelected;
         Explorer.FileDeleted += OnFileDeleted;
+        Explorer.NodePathChanged += OnNodePathChanged;
+    }
+
+    private void OnNodePathChanged(object? sender, (string oldPath, string newPath) change)
+    {
+        foreach(var tab in OpenTabs)
+        {
+            if(tab.FilePath == change.oldPath)
+            {
+                tab.UpdatePath(change.newPath);
+            }
+            else if (tab.FilePath.StartsWith(change.oldPath + Path.DirectorySeparatorChar))
+            {
+                var relative = tab.FilePath[(change.oldPath.Length)..];
+                tab.UpdatePath(change.newPath + relative);
+            }
+        }
     }
 
     private void OnFileDeleted(object? sender, string deletedPath)
@@ -50,6 +68,14 @@ public partial class MainViewModel : ViewModelBase
         var tab = await _tabFactory.CreateTabAsync(node);
         OpenTabs.Add(tab);
         SelectedTab = tab;
+    }
+    partial void OnSelectedTabChanged(TabViewModelBase? value)
+    {
+        if(value is not null)
+        {
+            // Debug.WriteLine(value.FilePath);
+            Explorer.SelectByPath(value.FilePath);
+        }
     }
 
     [RelayCommand]

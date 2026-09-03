@@ -45,6 +45,10 @@ public sealed class DialogService : IDialogService
 
         await dialog.ShowDialog<bool>(owner);
     }
+    public Task<string> PromptForNameAsync(string message)
+    {
+        throw new System.NotImplementedException();
+    }
 
     private Window? GetMainWindow()
     {

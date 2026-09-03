@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:levras.Presentation.Views"
         xmlns:vm="using:levras.Presentation.ViewModels"
         x:Class="levras.Presentation.Views.MainWindow"
         x:DataType="vm:MainViewModel"
@@ -17,31 +18,10 @@
                           Command="{Binding SaveActiveTabCommand}" />
             </MenuItem>
         </Menu>
-
         <Grid ColumnDefinitions="260,4,*">
-
-            <TreeView Grid.Column="0" ItemsSource="{Binding Explorer.RootItems}">
-                <TreeView.Styles>
-                    <Style Selector="TreeViewItem" x:DataType="vm:WorkspaceItemViewModel">
-                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                        <Setter Property="ContextMenu">
-                            <Setter.Value>
-                                <ContextMenu>
-                                    <MenuItem Header="Delete"
-                                              Command="{Binding $parent[TreeView].((vm:MainViewModel)DataContext).Explorer.DeleteFileCommand}"
-                                              CommandParameter="{Binding}" />
-                                </ContextMenu>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </TreeView.Styles>
-                <TreeView.ItemTemplate>
-                    <TreeDataTemplate ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Name}" />
-                    </TreeDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-
+            
+            <views:WorkspaceExplorerView Grid.Column="0" DataContext="{Binding Explorer}" />
+            
             <GridSplitter Grid.Column="1" Background="Gray" ResizeDirection="Columns" />
 
             <Grid Grid.Column="2">
