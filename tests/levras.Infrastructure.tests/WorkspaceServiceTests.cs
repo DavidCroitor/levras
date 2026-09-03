@@ -7,12 +7,14 @@ public class WorkspaceServiceTests : IDisposable
 {
     private readonly string _testRoot;
     private readonly WorkspaceService _sut;
+    private readonly FileSystemService _fileSystemService;
 
     public WorkspaceServiceTests()
     {
         _testRoot = Path.Combine(Path.GetTempPath(), "MarkdownEditorTests_" + Guid.NewGuid());
         Directory.CreateDirectory(_testRoot);
-        _sut = new WorkspaceService();
+        _fileSystemService = new FileSystemService();
+        _sut = new WorkspaceService(_fileSystemService);
     }
 
     public void Dispose()

@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:levras.Presentation.ViewModels"
+             x:Class="levras.Presentation.Views.WorkspaceExplorerView"
+             x:DataType="vm:WorkspaceExplorerViewModel">
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4" Margin="4">
+            <Button Content="New File" 
+                    Command="{Binding BeginCreateFileCommand}" 
+                    CommandParameter="{Binding SelectedItem}"
+                    IsEnabled="{Binding IsWorkspaceOpen}"
+                    IsVisible="{Binding IsWorkspaceOpen}"/>
+            <Button Content="New Folder" 
+                    Command="{Binding BeginCreateFolderCommand}" 
+                    CommandParameter="{Binding SelectedItem}"
+                    IsEnabled="{Binding IsWorkspaceOpen}"
+                    IsVisible="{Binding IsWorkspaceOpen}"/>
+        </StackPanel>
+
+        <TreeView ItemsSource="{Binding RootItems}"
+                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}"  >
+            <TreeView.Styles>
+                <Style Selector="TreeViewItem" x:DataType="vm:WorkspaceItemViewModel">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="Rename"
+                                          Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).BeginRenameCommand}"
+                                          CommandParameter="{Binding}" />
+                                <MenuItem Header="Delete"
+                                          Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).DeleteNodeCommand}"
+                                          CommandParameter="{Binding}" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TreeView.Styles>
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding Children}">
+                    <Grid>
+                        <TextBlock Text="{Binding Name}" IsVisible="{Binding !IsEditing}"
+                                   DoubleTapped="OnNodeDoubleTapped" />
+                        <TextBox Text="{Binding EditingName}" IsVisible="{Binding IsEditing}"
+                                 KeyDown="OnRenameTextBoxKeyDown" LostFocus="OnRenameTextBoxLostFocus" />
+                    </Grid>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </DockPanel>
+</UserControl>

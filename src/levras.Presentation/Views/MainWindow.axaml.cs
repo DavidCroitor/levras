@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using AvaloniaEdit.Document;
+using levras.Presentation.ViewModels;
 
 namespace levras.Presentation.Views;
 

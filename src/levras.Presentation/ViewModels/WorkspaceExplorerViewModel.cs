@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using levras.Core.Abstractions;
+using levras.Core.Domain;
 using levras.Core.Exceptions;
 using levras.Presentation.Services;
 
@@ -15,23 +15,22 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
 {
     private readonly IWorkspaceService _workspaceService;
     private readonly IDialogService _dialogService;
-    private readonly IFileSystemService _fileSystemService;
-    private WorkspaceItemViewModel? _currentlySelected;
-    private bool _isSyncingSelection;
+    [ObservableProperty] private WorkspaceItemViewModel? _selectedItem;
+    [ObservableProperty] private bool _isWorkspaceOpen = false;
+    private WorkspaceItemViewModel? _pendingCreate;
 
     public ObservableCollection<WorkspaceItemViewModel> RootItems { get; } = new();
 
-    public event EventHandler<string>? FileSelected;
-    public event EventHandler<string>? FileDeleted;
+    public event EventHandler<WorkspaceItemViewModel>? FileSelected;
+    public event EventHandler<string>? NodeDeleted;
+    public event EventHandler<(string oldPath, string newPath)>? NodePathChanged;
 
     public WorkspaceExplorerViewModel(
         IWorkspaceService workspaceService,
-        IDialogService dialogService,
-        IFileSystemService fileSystemService)
+        IDialogService dialogService)
     {
         _workspaceService = workspaceService;
         _dialogService = dialogService;
-        _fileSystemService = fileSystemService;
     }
 
     public async Task LoadWorkspaceAsync(string folderPath)
@@ -40,26 +39,27 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         var tree = await _workspaceService.GetWorkspaceTreeAsync();
 
         RootItems.Clear();
-        _currentlySelected = null;
+        SelectedItem = null;
         foreach (var item in tree)
         {
             var vm = new WorkspaceItemViewModel(item);
-            WireSelection(vm);
             RootItems.Add(vm);
         }
+        IsWorkspaceOpen = true;
     }
 
     [RelayCommand]
-    public async Task DeleteFileAsync(WorkspaceItemViewModel? item)
+    public async Task DeleteNodeAsync(WorkspaceItemViewModel? item)
     {
-        if (item is null || item.IsDirectory)
+        if (item is null)
         {
             return;
         }
 
         var confirmed = await _dialogService.ConfirmAsync(
-            "Delete File",
-            $"Are you sure you want to delete \"{item.Name}\"?"
+            item.IsDirectory ?   "Delete Folder" : "Delete File",
+            item.IsDirectory ?  $"Are you sure you want to delete \"{item.Name}\" and everything inside?" :
+                                $"Are you sure you want to delete \"{item.Name}\"?"
         );
         if(!confirmed)
         {
@@ -72,17 +72,159 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
                 throw new PathOutsideWorkspaceException(item.FullPath);
             }
 
-            await _fileSystemService.DeleteFileAsync(item.FullPath);
-
+            await _workspaceService.DeleteAsync(item.FullPath);
+            
             RemoveFromTree(item);
-            FileDeleted?.Invoke(this, item.FullPath);
+            NodeDeleted?.Invoke(this, item.FullPath);
         }
         catch(WorkspaceIoException ex)
         {
             await _dialogService.ShowErrorAsync(ex.Message);
         }
     }
+    public void SelectByPath(string filePath)
+    {
+        var node = FindNode(RootItems, filePath);
+        if (node is null || node == SelectedItem) return;
 
+        SelectedItem = node;
+    }
+    
+
+    // ==================== PRIVATE ====================
+    partial void OnSelectedItemChanged(WorkspaceItemViewModel? value)
+    {
+        if(value is null) return;
+
+        if(value.IsDirectory) return;
+        if(!value.IsTextFile && !value.IsImageFile) return;
+
+        FileSelected?.Invoke(this, value);
+
+    }
+    [RelayCommand]
+    private void BeginCreateFolder(WorkspaceItemViewModel? targetFolder)
+    {
+        if(_pendingCreate is not null) return;
+
+        var parent = targetFolder?.IsDirectory == true ? targetFolder : targetFolder?.Parent;
+        var placeholder = new WorkspaceItemViewModel(
+            new WorkspaceItem(string.Empty, string.Empty, true, []), parent)
+        {
+            IsEditing = true,
+            EditingName = string.Empty,
+        };
+
+        if(parent is null)
+        {
+            RootItems.Insert(0, placeholder);
+        }
+        else
+        {
+            parent.Children.Insert(0, placeholder);
+        }
+
+        _pendingCreate = placeholder;
+    }
+    [RelayCommand]
+    private void BeginCreateFile(WorkspaceItemViewModel? targetFolder)
+    {
+        if(_pendingCreate is not null) return;
+        var parent = targetFolder?.IsDirectory == true ? targetFolder : targetFolder?.Parent;
+        var placeholder = new WorkspaceItemViewModel(
+            new WorkspaceItem(string.Empty, string.Empty, false, []), parent)
+        {
+            IsEditing = true,
+            EditingName = string.Empty,
+        };
+
+        if(parent is null)
+        {
+            RootItems.Insert(0, placeholder);
+        }
+        else
+        {
+            parent.Children.Insert(0, placeholder);
+        }
+
+        _pendingCreate = placeholder;
+    }
+    [RelayCommand]
+    private void BeginRename(WorkspaceItemViewModel node)
+    {
+        node.EditingName = node.Name;
+        node.IsEditing = true;
+    }
+    [RelayCommand]
+    private async Task CommitRenameAsync(WorkspaceItemViewModel node)
+    {
+        node.IsEditing = false;
+        if (node == _pendingCreate)
+        {
+            _pendingCreate = null;
+            if (string.IsNullOrWhiteSpace(node.EditingName)) 
+            { 
+                RemoveFromTree(node); 
+                return; 
+            }
+
+            var parentPath = node.Parent?.FullPath ?? _workspaceService.CurrentWorkspacePath!;
+            try
+            {
+                var created = node.IsDirectory
+                ? await _workspaceService.CreateFolderAsync(parentPath, node.EditingName)
+                : await _workspaceService.CreateFileAsync(parentPath, node.EditingName);
+                ReplaceInParent(node, created);
+            }
+            catch (WorkspaceIoException ex)
+            {
+                RemoveFromTree(node);
+                await _dialogService.ShowErrorAsync(ex.Message);
+            }
+            return;
+        }
+
+        if(node.EditingName == node.Name || string.IsNullOrWhiteSpace(node.EditingName))
+        {
+            return;
+        }
+
+        try
+        {
+            var renamed = await _workspaceService.RenameAsync(node.FullPath, node.EditingName);
+            ReplaceInParent(node, renamed);
+            NodePathChanged?.Invoke(this, (node.FullPath, renamed.FullPath));
+        }
+        catch(WorkspaceIoException ex)
+        {
+            await _dialogService.ShowErrorAsync(ex.Message);
+        }
+    }
+    [RelayCommand]
+    private void CancelRename(WorkspaceItemViewModel node)
+    {
+        node.IsEditing = false;
+        if(node == _pendingCreate)
+        {
+            _pendingCreate = null;
+            RemoveFromTree(node);
+        }
+    }
+    private void ReplaceInParent(WorkspaceItemViewModel oldNode, WorkspaceItem newItem)
+    {
+        var newVm = new WorkspaceItemViewModel(newItem, oldNode.Parent);
+        if(oldNode.Parent is null)
+        {
+            var index = RootItems.IndexOf(oldNode);
+            RootItems[index] = newVm;
+        }
+        else
+        {
+            var index = oldNode.Parent.Children.IndexOf(oldNode);
+            oldNode.Parent.Children[index] = newVm;
+        }
+        
+    }
     private void RemoveFromTree(WorkspaceItemViewModel item)
     {
         if (RootItems.Remove(item))
@@ -92,9 +234,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
 
         RemoveFromChildren(RootItems, item);
     }
-
-    private static bool RemoveFromChildren(
-        IEnumerable<WorkspaceItemViewModel> nodes, WorkspaceItemViewModel target)
+    private static bool RemoveFromChildren(IEnumerable<WorkspaceItemViewModel> nodes, WorkspaceItemViewModel target)
     {
         foreach (var node in nodes)
         {
@@ -111,57 +251,14 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
 
         return false;
     }
-
-    private void WireSelection(WorkspaceItemViewModel node)
-    {
-        node.SelectionRequested = OnNodeSelectionRequested;
-        foreach (var child in node.Children)
-        {
-            WireSelection(child);
-        }
-    }
-
-    private void OnNodeSelectionRequested(WorkspaceItemViewModel node)
-    {
-        if (_isSyncingSelection || node.IsDirectory || node == _currentlySelected)
-        {
-            return;
-        }
-        if(!node.IsTextFile)
-        {
-            return;
-        }
-
-        SetSyncedSelection(false); 
-        _currentlySelected = node;
-
-        FileSelected?.Invoke(this, node.FullPath);
-    }
-
-    public void RevertSelectionTo(string? filePath)
-    {
-        SetSyncedSelection(false);
-        _currentlySelected = filePath is null ? null : FindItemByPath(RootItems, filePath);
-        SetSyncedSelection(true);
-    }
-
-    private void SetSyncedSelection(bool selected)
-    {
-        if (_currentlySelected is null) return;
-        _isSyncingSelection = true;
-        try { _currentlySelected.IsSelected = selected; }
-        finally { _isSyncingSelection = false; }
-    }
-
-    private static WorkspaceItemViewModel? FindItemByPath(
-        IEnumerable<WorkspaceItemViewModel> items, string filePath)
+    private static WorkspaceItemViewModel? FindNode(IEnumerable<WorkspaceItemViewModel> items, string filePath)
     {
         foreach (var item in items)
         {
             if (!item.IsDirectory && item.FullPath == filePath) return item;
             if (item.IsDirectory)
             {
-                var found = FindItemByPath(item.Children, filePath);
+                var found = FindNode(item.Children, filePath);
                 if (found is not null) return found;
             }
         }

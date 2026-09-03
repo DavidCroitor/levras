@@ -1,12 +1,17 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="levras.Presentation.App"
-             xmlns:local="using:levras.Presentation"
+             xmlns:views="using:levras.Presentation.Views"
+             xmlns:vm="using:levras.Presentation.ViewModels"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <local:ViewLocator />
+        <DataTemplate DataType="{x:Type vm:TextEditorTabViewModel}">
+            <views:TextEditorTabView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ImageViewerTabViewModel}">
+            <views:ImageViewerTabView />
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>

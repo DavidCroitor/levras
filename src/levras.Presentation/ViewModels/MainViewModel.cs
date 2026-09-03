@@ -1,42 +1,92 @@
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using levras.Core.Exceptions;
 using levras.Presentation.Services;
-using Microsoft.VisualBasic;
 
 namespace levras.Presentation.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    private readonly IFolderPickerService _folderPickerService;
-    public WorkspaceExplorerViewModel Explorer {get; }
-    public EditorViewModel Editor {get;}
+    private readonly ITabFactory _tabFactory;
     private readonly IDialogService _dialogService;
+    private readonly IFolderPickerService _folderPickerService;
+    public WorkspaceExplorerViewModel Explorer { get; }
+    public ObservableCollection<TabViewModelBase> OpenTabs { get; } = new();
+    [ObservableProperty] private TabViewModelBase? _selectedTab;
 
     public MainViewModel(
-        IFolderPickerService folderPickerService,
-        WorkspaceExplorerViewModel explorer,
-        EditorViewModel editor,
-        IDialogService dialogService
-    )
+            WorkspaceExplorerViewModel explorer,
+            IDialogService dialogService, 
+            IFolderPickerService folderPickerService,
+            ITabFactory tabFactory)
     {
+        Explorer = explorer;
+        _tabFactory = tabFactory;
         _dialogService = dialogService;
         _folderPickerService = folderPickerService;
-        Explorer = explorer;
-        Editor = editor;
-
         Explorer.FileSelected += OnFileSelected;
-        Explorer.FileDeleted += OnFileDeleted;
+        Explorer.NodeDeleted += OnNodeDeleted;
+        Explorer.NodePathChanged += OnNodePathChanged;
     }
 
-    private void OnFileDeleted(object? sender, string filePath)
+    private void OnNodePathChanged(object? sender, (string oldPath, string newPath) change)
     {
-        if(filePath == Editor.CurrentFilePath)
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+        foreach(var tab in OpenTabs)
         {
-            Editor.Reset();
+            if(tab.FilePath.Equals(change.oldPath, comparison))
+            {
+                tab.UpdatePath(change.newPath);
+            }
+            else if (tab.FilePath.StartsWith(change.oldPath + Path.DirectorySeparatorChar, comparison))
+            {
+                var relative = tab.FilePath[(change.oldPath.Length)..];
+                tab.UpdatePath(change.newPath + relative);
+            }
+        }
+    }
+
+    private void OnNodeDeleted(object? sender, string deletedPath)
+    {
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+        var directoryPrefix = deletedPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        var deletedTabs = OpenTabs.Where(
+            tab =>  tab.FilePath.Equals(deletedPath, comparison) ||
+                    tab.FilePath.StartsWith(directoryPrefix, comparison)
+            ).ToList();
+
+        foreach(var tab in deletedTabs)
+            OpenTabs.Remove(tab);
+            
+        if(SelectedTab is not null && !OpenTabs.Contains(SelectedTab))
+        {
+            SelectedTab = OpenTabs.LastOrDefault();
+        }
+    }
+
+    private async void OnFileSelected(object? sender, WorkspaceItemViewModel node)
+    {
+        var existing = OpenTabs.FirstOrDefault(t => t.FilePath == node.FullPath);
+        if (existing is not null) { SelectedTab = existing; return; }
+
+        var tab = await _tabFactory.CreateTabAsync(node);
+        OpenTabs.Add(tab);
+        SelectedTab = tab;
+    }
+    partial void OnSelectedTabChanged(TabViewModelBase? value)
+    {
+        if(value is not null)
+        {
+            Explorer.SelectByPath(value.FilePath);
         }
     }
 
@@ -57,34 +107,20 @@ public partial class MainViewModel : ViewModelBase
             await _dialogService.ShowErrorAsync(ex.Message);
         }
     }
-    
-
-    private async void OnFileSelected(object? sender, string filePath)
+    [RelayCommand]
+    private async Task CloseTabAsync(TabViewModelBase tab)
     {
-        try
-        {
-                if(filePath == Editor.CurrentFilePath)
-            {
-                return;
-            }
-            if(!await Editor.TryPrepareToDiscardAsync())
-            {
-                Explorer.RevertSelectionTo(Editor.CurrentFilePath);
-                return;
-            }
-        }
-        catch(WorkspaceIoException ex)
-        {
-            await _dialogService.ShowErrorAsync(ex.Message);
-        }
+        if (tab is TextEditorTabViewModel { IsDirty: true } editorTab && !await editorTab.TryPrepareToDiscardAsync())
+            return;
 
-        try
-        {
-            await Editor.LoadFileAsync(filePath);
-        }
-        catch (WorkspaceIoException ex)
-        {
-            await _dialogService.ShowErrorAsync(ex.Message);
-        }
+        OpenTabs.Remove(tab);
+        if (SelectedTab == tab) SelectedTab = OpenTabs.LastOrDefault();
+    }   
+
+    [RelayCommand]
+    private async Task SaveActiveTabAsync()
+    {
+        if (SelectedTab is TextEditorTabViewModel textTab)
+            await textTab.SaveAsync();
     }
 }

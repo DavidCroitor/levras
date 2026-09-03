@@ -1,4 +1,4 @@
-namespace levras.Core.Models;
+namespace levras.Core.Domain;
 
 public sealed record WorkspaceItem(
     string Name,

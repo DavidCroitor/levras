@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:levras.Presentation.ViewModels"
+             x:Class="levras.Presentation.Views.ImageViewerTabView"
+             x:DataType="vm:ImageViewerTabViewModel">
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  Background="{DynamicResource SystemRegionColor}">
+        <Image Source="{Binding Image}"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Margin="16" />
+    </ScrollViewer>
+</UserControl>
