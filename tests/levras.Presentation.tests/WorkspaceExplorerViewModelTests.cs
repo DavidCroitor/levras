@@ -9,14 +9,13 @@ namespace levras.Presentation.Tests;
 public class WorkspaceExplorerViewModelTests
 {
     private readonly IWorkspaceService _workspaceService = Substitute.For<IWorkspaceService>();
-    private readonly IFileSystemService _fileSystemService = Substitute.For<IFileSystemService>();
     private readonly IDialogService _dialogService = Substitute.For<IDialogService>();
     private readonly WorkspaceExplorerViewModel _sut;
 
     public WorkspaceExplorerViewModelTests()
     {
         _workspaceService.IsPathWithinWorkspace(Arg.Any<string>()).Returns(true);
-        _sut = new WorkspaceExplorerViewModel(_workspaceService, _dialogService, _fileSystemService);
+        _sut = new WorkspaceExplorerViewModel(_workspaceService, _dialogService);
     }
 
     private async Task<WorkspaceItemViewModel> LoadSingleFileWorkspaceAsync(string fileName = "notes.md")

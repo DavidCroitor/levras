@@ -15,7 +15,6 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
 {
     private readonly IWorkspaceService _workspaceService;
     private readonly IDialogService _dialogService;
-    private readonly IFileSystemService _fileSystemService;
     [ObservableProperty] private WorkspaceItemViewModel? _selectedItem;
     [ObservableProperty] private bool _isWorkspaceOpen = false;
     private WorkspaceItemViewModel? _pendingCreate;
@@ -28,12 +27,10 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
 
     public WorkspaceExplorerViewModel(
         IWorkspaceService workspaceService,
-        IDialogService dialogService,
-        IFileSystemService fileSystemService)
+        IDialogService dialogService)
     {
         _workspaceService = workspaceService;
         _dialogService = dialogService;
-        _fileSystemService = fileSystemService;
     }
 
     public async Task LoadWorkspaceAsync(string folderPath)
