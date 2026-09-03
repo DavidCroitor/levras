@@ -44,9 +44,9 @@ public partial class TextEditorTabViewModel : TabViewModelBase
     public async Task LoadFileAsync(CancellationToken cancellationToken = default )
     {
         _isLoadingContent = true;
-        var content = await _workspaceService.ReadFileAsync(FilePath);
         try
         {
+            var content = await _workspaceService.ReadFileAsync(FilePath, cancellationToken);
             Document.Text = content;
         }
         finally

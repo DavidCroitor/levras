@@ -14,5 +14,4 @@ public interface IDialogService
     Task<SaveChangesChoice> ConfirmSaveChangesAsync(string fileName);
     Task<bool> ConfirmAsync(string title, string message);
     Task ShowErrorAsync(string message);
-    Task<string> PromptForNameAsync(string message);
 }

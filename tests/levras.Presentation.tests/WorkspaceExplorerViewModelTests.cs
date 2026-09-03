@@ -40,7 +40,7 @@ public class WorkspaceExplorerViewModelTests
 
         await _sut.DeleteNodeCommand.ExecuteAsync(item);
 
-        await _fileSystemService.Received(1).DeleteFileAsync(item.FullPath, Arg.Any<CancellationToken>());
+        await _workspaceService.Received(1).DeleteAsync(item.FullPath, Arg.Any<CancellationToken>());
         Assert.DoesNotContain(item, _sut.RootItems);
     }
 
@@ -52,7 +52,7 @@ public class WorkspaceExplorerViewModelTests
 
         await _sut.DeleteNodeCommand.ExecuteAsync(item);
 
-        await _fileSystemService.DidNotReceive().DeleteFileAsync(
+        await _workspaceService.DidNotReceive().DeleteAsync(
             Arg.Any<string>(), Arg.Any<CancellationToken>());
         Assert.Contains(item, _sut.RootItems);
     }
@@ -75,7 +75,7 @@ public class WorkspaceExplorerViewModelTests
     {
         var item = await LoadSingleFileWorkspaceAsync();
         _dialogService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
-        _fileSystemService.DeleteFileAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _workspaceService.DeleteAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns<Task>(_ => throw new Core.Exceptions.AccessDeniedException(item.FullPath));
 
         await _sut.DeleteNodeCommand.ExecuteAsync(item);

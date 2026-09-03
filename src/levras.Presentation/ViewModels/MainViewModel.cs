@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using levras.Core.Exceptions;
 using levras.Presentation.Services;
-using Microsoft.VisualBasic;
 
 namespace levras.Presentation.ViewModels;
 
@@ -38,13 +36,16 @@ public partial class MainViewModel : ViewModelBase
 
     private void OnNodePathChanged(object? sender, (string oldPath, string newPath) change)
     {
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
         foreach(var tab in OpenTabs)
         {
-            if(tab.FilePath == change.oldPath)
+            if(tab.FilePath.Equals(change.oldPath, comparison))
             {
                 tab.UpdatePath(change.newPath);
             }
-            else if (tab.FilePath.StartsWith(change.oldPath + Path.DirectorySeparatorChar))
+            else if (tab.FilePath.StartsWith(change.oldPath + Path.DirectorySeparatorChar, comparison))
             {
                 var relative = tab.FilePath[(change.oldPath.Length)..];
                 tab.UpdatePath(change.newPath + relative);
@@ -54,10 +55,13 @@ public partial class MainViewModel : ViewModelBase
 
     private void OnNodeDeleted(object? sender, string deletedPath)
     {
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
         var directoryPrefix = deletedPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
         var deletedTabs = OpenTabs.Where(
-            tab =>  tab.FilePath == deletedPath ||
-                    tab.FilePath.StartsWith(directoryPrefix, StringComparison.Ordinal)
+            tab =>  tab.FilePath.Equals(deletedPath, comparison) ||
+                    tab.FilePath.StartsWith(directoryPrefix, comparison)
             ).ToList();
 
         foreach(var tab in deletedTabs)
@@ -82,7 +86,6 @@ public partial class MainViewModel : ViewModelBase
     {
         if(value is not null)
         {
-            // Debug.WriteLine(value.FilePath);
             Explorer.SelectByPath(value.FilePath);
         }
     }

@@ -61,23 +61,17 @@ public sealed class WorkspaceService : IWorkspaceService
         {
             throw new PathOutsideWorkspaceException(filePath);
         }
-        if(await _fileSystemService.FileExistsAsync(filePath))
-        {
-            return await _fileSystemService.ReadFileAsync(filePath, cancellationToken);
-        }
-        else
-        {
-            throw new FileNotFoundInWorkspaceException(filePath);
-        }
+        
+        return await _fileSystemService.ReadFileAsync(filePath, cancellationToken);
     }
 
-    public Task<byte[]> ReadFileBytesAsync(string filePath, CancellationToken cancellationToken = default)
+    public async Task<byte[]> ReadFileBytesAsync(string filePath, CancellationToken cancellationToken = default)
     {
         if(!IsPathWithinWorkspace(filePath))
         {
             throw new PathOutsideWorkspaceException(filePath);
         }
-        return _fileSystemService.ReadFileBytesAsync(filePath, cancellationToken);
+        return await _fileSystemService.ReadFileBytesAsync(filePath, cancellationToken);
     }
     public async Task WriteFileAsync(string filePath, string content, CancellationToken cancellationToken = default)
     {
@@ -182,9 +176,12 @@ public sealed class WorkspaceService : IWorkspaceService
     // ============== PRIVATE ==============
     private static bool IsSameOrDescendant(string sourceDirectoryPath, string destinationFullPath)
     {
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
         var normalizedSource = Path.TrimEndingDirectorySeparator(sourceDirectoryPath) + Path.DirectorySeparatorChar;
         var normalizedDestination = Path.TrimEndingDirectorySeparator(destinationFullPath) + Path.DirectorySeparatorChar;
-        return normalizedDestination.StartsWith(normalizedSource, StringComparison.OrdinalIgnoreCase);
+        return normalizedDestination.StartsWith(normalizedSource, comparison);
     }
     private async Task<WorkspaceItem> MoveInternalAsync(string sourcePath, string destinationFullPath, CancellationToken cancellationToken)
     {

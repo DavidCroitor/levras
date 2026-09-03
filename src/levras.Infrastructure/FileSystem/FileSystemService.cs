@@ -1,6 +1,4 @@
-using System.Net.Http.Headers;
 using levras.Core.Abstractions;
-using levras.Core.Domain;
 using levras.Core.Exceptions;
 
 namespace levras.Infrastructure.FileSystem;
@@ -116,13 +114,21 @@ public sealed class FileSystemService : IFileSystemService
     public async Task<byte[]> ReadFileBytesAsync(string filePath, CancellationToken cancellationToken = default)
     {
         try
-    {
-        return await File.ReadAllBytesAsync(filePath, cancellationToken);
-    }
-    catch (IOException ex)
-    {
-        throw new WorkspaceIoFailureException(filePath, ex);
-    }
+        {
+            return await File.ReadAllBytesAsync(filePath, cancellationToken);
+        }
+        catch(FileNotFoundException ex)
+        {
+            throw new FileNotFoundInWorkspaceException(filePath, ex);
+        }
+        catch(UnauthorizedAccessException ex)
+        {
+            throw new AccessDeniedException(filePath, ex);
+        }
+        catch(IOException ex)
+        {
+            throw new WorkspaceIoFailureException(filePath, ex);
+        }
     }
 
     public async Task WriteFileAsync(string filePath, string content, CancellationToken cancellationToken = default)

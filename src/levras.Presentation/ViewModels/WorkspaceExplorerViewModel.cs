@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using levras.Core.Abstractions;
@@ -78,14 +75,8 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
                 throw new PathOutsideWorkspaceException(item.FullPath);
             }
 
-            if(item.IsDirectory)
-            {
-                await _fileSystemService.DeleteDirectoryAsync(item.FullPath);
-            }
-            else
-            {
-                await _fileSystemService.DeleteFileAsync(item.FullPath);
-            }
+            await _workspaceService.DeleteAsync(item.FullPath);
+            
             RemoveFromTree(item);
             NodeDeleted?.Invoke(this, item.FullPath);
         }
@@ -102,26 +93,6 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         SelectedItem = node;
     }
     
-    private void InsertSorted(ObservableCollection<WorkspaceItemViewModel> children, WorkspaceItemViewModel newVm)
-    {
-        for (var index = 0; index < children.Count; index++)
-        {
-            var existing = children[index];
-            if (!newVm.IsDirectory && existing.IsDirectory)
-            {
-                continue;
-            }
-
-            if (newVm.IsDirectory && !existing.IsDirectory ||
-                string.Compare(newVm.Name, existing.Name, StringComparison.OrdinalIgnoreCase) < 0)
-            {
-                children.Insert(index, newVm);
-                return;
-            }
-        }
-
-        children.Add(newVm);
-    }
 
     // ==================== PRIVATE ====================
     partial void OnSelectedItemChanged(WorkspaceItemViewModel? value)
@@ -203,7 +174,9 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
             var parentPath = node.Parent?.FullPath ?? _workspaceService.CurrentWorkspacePath!;
             try
             {
-                var created = await _workspaceService.CreateFileAsync(parentPath, node.EditingName);
+                var created = node.IsDirectory
+                ? await _workspaceService.CreateFolderAsync(parentPath, node.EditingName)
+                : await _workspaceService.CreateFileAsync(parentPath, node.EditingName);
                 ReplaceInParent(node, created);
             }
             catch (WorkspaceIoException ex)
@@ -225,7 +198,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
             ReplaceInParent(node, renamed);
             NodePathChanged?.Invoke(this, (node.FullPath, renamed.FullPath));
         }
-        catch(WorkspaceIoFailureException ex)
+        catch(WorkspaceIoException ex)
         {
             await _dialogService.ShowErrorAsync(ex.Message);
         }
@@ -254,18 +227,6 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
             oldNode.Parent.Children[index] = newVm;
         }
         
-    }
-    private void InsertIntoTree(WorkspaceItemViewModel? parentVm, WorkspaceItem? newItem)
-    {
-        var newVm = new WorkspaceItemViewModel(newItem!);
-        if(parentVm == null)
-        {
-            RootItems.Add(newVm);
-        }
-        else
-        {
-            parentVm.InsertChild(newItem!);
-        }
     }
     private void RemoveFromTree(WorkspaceItemViewModel item)
     {
