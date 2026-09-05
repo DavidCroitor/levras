@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Neutral scale: 950 = near-black, 50 = near-white -->
+    <Color x:Key="Slate950">#0F1115</Color>
+    <Color x:Key="Slate900">#171A21</Color>
+    <Color x:Key="Slate800">#20242D</Color>
+    <Color x:Key="Slate700">#2B303C</Color>
+    <Color x:Key="Slate600">#3A4150</Color>
+    <Color x:Key="Slate500">#545C6E</Color>
+    <Color x:Key="Slate400">#7B8494</Color>
+    <Color x:Key="Slate300">#A8AFBB</Color>
+    <Color x:Key="Slate200">#CBD0D8</Color>
+    <Color x:Key="Slate100">#E4E7EC</Color>
+    <Color x:Key="Slate50">#F5F6F8</Color>
+
+    <!-- Cool accent: base / hover / pressed -->
+    <Color x:Key="Accent500">#4C8AFF</Color>
+    <Color x:Key="Accent600">#2F6FED</Color>
+    <Color x:Key="Accent700">#2258C4</Color>
+
+    <!-- Reserved for states we'll need eventually (dirty-file dot, delete confirm, etc.) -->
+    <Color x:Key="Danger500">#E5484D</Color>
+
+</ResourceDictionary>

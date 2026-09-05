@@ -15,7 +15,12 @@ public partial class WorkspaceItemViewModel : ViewModelBase
     public bool IsDirectory {get;}
     public bool IsTextFile {get; }
     public bool IsImageFile {get; }
+    public bool ShowActiveIndicator => IsSelected && !IsEditing;
+    public string Icon => IsDirectory
+        ? string.Empty
+        : IsImageFile ? "\u25A8" : "\u25AD";
     public WorkspaceItemViewModel? Parent { get; }
+    public bool ShowGuideline => Parent is not null && !IsDirectory;
     public ObservableCollection<WorkspaceItemViewModel> Children {get; }
 
     [ObservableProperty] private bool _isSelected;
@@ -42,6 +47,12 @@ public partial class WorkspaceItemViewModel : ViewModelBase
         {
             SelectionRequested?.Invoke(this);
         }
+        OnPropertyChanged(nameof(ShowActiveIndicator));
+    }
+
+    partial void OnIsEditingChanged(bool value)
+    {    
+        OnPropertyChanged(nameof(ShowActiveIndicator));
     }
 
 }

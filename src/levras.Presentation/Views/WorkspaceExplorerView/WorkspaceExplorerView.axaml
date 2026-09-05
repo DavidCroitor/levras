@@ -23,6 +23,7 @@
             <TreeView.Styles>
                 <Style Selector="TreeViewItem" x:DataType="vm:WorkspaceItemViewModel">
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="Classes.activeFile" Value="{Binding ShowActiveIndicator}" />
                     <Setter Property="ContextMenu">
                         <Setter.Value>
                             <ContextMenu>
@@ -39,11 +40,34 @@
             </TreeView.Styles>
             <TreeView.ItemTemplate>
                 <TreeDataTemplate ItemsSource="{Binding Children}">
-                    <Grid>
-                        <TextBlock Text="{Binding Name}" IsVisible="{Binding !IsEditing}"
-                                   DoubleTapped="OnNodeDoubleTapped" />
-                        <TextBox Text="{Binding EditingName}" IsVisible="{Binding IsEditing}"
-                                 KeyDown="OnRenameTextBoxKeyDown" LostFocus="OnRenameTextBoxLostFocus" />
+                    <Grid VerticalAlignment="Stretch" ColumnDefinitions="10,*">
+
+                        <Border Grid.Column="0" Width="1"
+                                VerticalAlignment="Stretch"
+                                Background="{StaticResource BorderBrush}"
+                                IsVisible="{Binding ShowGuideline}"/>
+
+                        <Border Grid.Column="1"
+                                HorizontalAlignment="Stretch" 
+                                Padding="0">
+                            <Grid ColumnDefinitions="14,*" 
+                                    ColumnSpacing="2">
+                                <TextBlock Grid.Column="0" 
+                                        Text="{Binding Icon}"
+                                        Foreground="{StaticResource TextSecondaryBrush}"
+                                        VerticalAlignment="Center" 
+                                        TextAlignment="Center"/>
+                                <Grid Grid.Column="1">
+                                    <TextBlock Text="{Binding Name}" 
+                                            IsVisible="{Binding !IsEditing}"
+                                            Foreground="{StaticResource TextPrimaryBrush}"
+                                            VerticalAlignment="Center"
+                                            DoubleTapped="OnNodeDoubleTapped" />
+                                    <TextBox Text="{Binding EditingName}" IsVisible="{Binding IsEditing}"
+                                            KeyDown="OnRenameTextBoxKeyDown" LostFocus="OnRenameTextBoxLostFocus" />
+                                </Grid>
+                            </Grid>
+                        </Border>
                     </Grid>
                 </TreeDataTemplate>
             </TreeView.ItemTemplate>

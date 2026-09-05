@@ -1,12 +1,31 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:levras.Presentation.ViewModels"
-             xmlns:AvaloniaEdit="using:AvaloniaEdit"
+             xmlns:ae="using:AvaloniaEdit"
+             xmlns:md="using:Markdown.Avalonia"
              x:Class="levras.Presentation.Views.TextEditorTabView"
              x:DataType="vm:TextEditorTabViewModel">
 
-    <AvaloniaEdit:TextEditor Document="{Binding Document}"
-                              FontFamily="Consolas,Menlo,monospace"
-                              FontSize="14"
-                              ShowLineNumbers="True" />
+    <Grid ColumnDefinitions="*,4,*">
+
+        <Border Grid.Column="0" Background="{StaticResource EditorBackgroundBrush}">
+            <ae:TextEditor Document="{Binding Document}"
+                            FontFamily="{StaticResource FontFamilyMono}"
+                            FontSize="{StaticResource EditorFontSize}"
+                            Foreground="{StaticResource EditorForegroundBrush}"
+                            Background="Transparent"
+                            ShowLineNumbers="False"
+                            WordWrap="True"/>
+        </Border>
+
+        <GridSplitter Grid.Column="1"
+                      Background="{StaticResource BorderBrush}"
+                      ResizeDirection="Columns" />
+
+        <Border Grid.Column="2" Background="{StaticResource PreviewBackgroundBrush}">
+            <md:MarkdownScrollViewer Markdown="{Binding MarkdownText}"
+                                      Margin="{StaticResource SpacingMedium}" />
+        </Border>
+
+    </Grid>
 </UserControl>

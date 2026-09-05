@@ -3,7 +3,17 @@
              x:Class="levras.Presentation.App"
              xmlns:views="using:levras.Presentation.Views"
              xmlns:vm="using:levras.Presentation.ViewModels"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://levras.Presentation/Theme/Palette.axaml"/>
+                <ResourceInclude Source="avares://levras.Presentation/Theme/Tokens.axaml"/>
+                <ResourceInclude Source="avares://levras.Presentation/Theme/ControlThemes.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 
     <Application.DataTemplates>
         <DataTemplate DataType="{x:Type vm:TextEditorTabViewModel}">
@@ -17,5 +27,6 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+        <StyleInclude Source="avares://levras.Presentation/Theme/Styles.axaml"/>
     </Application.Styles>
 </Application>

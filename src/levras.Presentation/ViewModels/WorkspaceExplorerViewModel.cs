@@ -24,6 +24,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
     public event EventHandler<WorkspaceItemViewModel>? FileSelected;
     public event EventHandler<string>? NodeDeleted;
     public event EventHandler<(string oldPath, string newPath)>? NodePathChanged;
+    
 
     public WorkspaceExplorerViewModel(
         IWorkspaceService workspaceService,
@@ -89,17 +90,32 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
 
         SelectedItem = node;
     }
-    
+
 
     // ==================== PRIVATE ====================
-    partial void OnSelectedItemChanged(WorkspaceItemViewModel? value)
+    partial void OnSelectedItemChanged(WorkspaceItemViewModel? oldValue, WorkspaceItemViewModel? newValue)
     {
-        if(value is null) return;
+        if(oldValue is not null)
+        {
+            oldValue.IsSelected = false;
+        }
+        if(newValue is null)
+        {
+            return;
+        }
+        newValue.IsSelected = true;
 
-        if(value.IsDirectory) return;
-        if(!value.IsTextFile && !value.IsImageFile) return;
+        if (newValue.IsDirectory)
+        {
+            return;
+        }
 
-        FileSelected?.Invoke(this, value);
+        if (!newValue.IsTextFile && !newValue.IsImageFile)
+        {
+            return;
+        }
+
+        FileSelected?.Invoke(this, newValue);
 
     }
     [RelayCommand]
