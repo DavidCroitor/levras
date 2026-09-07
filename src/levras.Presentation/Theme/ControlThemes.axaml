@@ -66,5 +66,31 @@
 
     </ControlTheme>
 
+    <ControlTheme x:Key="{x:Type TreeViewItem}" TargetType="TreeViewItem">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUI}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeDefault}"/>
+
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel>
+                    <Border Name="PART_LayoutRoot"
+                            Background="Transparent"
+                            CornerRadius="{StaticResource RadiusSmall}">
+                        <ContentPresenter Name="PART_HeaderPresenter"
+                                        Content="{TemplateBinding Header}"
+                                        ContentTemplate="{TemplateBinding HeaderTemplate}"/>
+                    </Border>
+
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                    Margin="0"
+                                    IsVisible="{TemplateBinding IsExpanded}"/>
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+
+
+    </ControlTheme>
 
 </ResourceDictionary>

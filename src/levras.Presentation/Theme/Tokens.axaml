@@ -7,6 +7,7 @@
     <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{StaticResource Slate800}"/>
 
     <!-- Borders -->
+    <SolidColorBrush x:Key="BorderStrongBrush" Color="{StaticResource Slate600}"/>
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource Slate700}"/>
     <SolidColorBrush x:Key="BorderSubtleBrush" Color="{StaticResource Slate800}"/>
 
@@ -22,9 +23,9 @@
     <SolidColorBrush x:Key="AccentForegroundBrush" Color="{StaticResource Slate50}"/>
 
     <!-- Editor / Preview panes -->
-    <SolidColorBrush x:Key="EditorBackgroundBrush" Color="{StaticResource Slate950}"/>
+    <SolidColorBrush x:Key="EditorBackgroundBrush" Color="{StaticResource Slate900}"/>
     <SolidColorBrush x:Key="EditorForegroundBrush" Color="{StaticResource Slate100}"/>
-    <SolidColorBrush x:Key="PreviewBackgroundBrush" Color="{StaticResource Slate900}"/>
+    <SolidColorBrush x:Key="PreviewBackgroundBrush" Color="{StaticResource Slate800}"/>
 
     <!-- Status -->
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource Danger500}"/>

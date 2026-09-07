@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:levras.Presentation.ViewModels"
              x:Class="levras.Presentation.Views.WorkspaceExplorerView"
-             x:DataType="vm:WorkspaceExplorerViewModel">
+             x:DataType="vm:WorkspaceExplorerViewModel"> 
 
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4" Margin="4">
@@ -19,11 +19,14 @@
         </StackPanel>
 
         <TreeView ItemsSource="{Binding RootItems}"
-                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}"  >
+                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                  MinWidth="200">
             <TreeView.Styles>
                 <Style Selector="TreeViewItem" x:DataType="vm:WorkspaceItemViewModel">
-                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                     <Setter Property="Classes.activeFile" Value="{Binding ShowActiveIndicator}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="ToolTip.Tip" Value="{Binding Name}"/>
                     <Setter Property="ContextMenu">
                         <Setter.Value>
                             <ContextMenu>
@@ -40,35 +43,59 @@
             </TreeView.Styles>
             <TreeView.ItemTemplate>
                 <TreeDataTemplate ItemsSource="{Binding Children}">
-                    <Grid VerticalAlignment="Stretch" ColumnDefinitions="10,*">
+                    <Border Classes="treeRow" 
+                            HorizontalAlignment="Stretch"
+                            CornerRadius="{StaticResource RadiusSmall}">
+                        <Grid VerticalAlignment="Stretch" ColumnDefinitions="Auto,14,*">
+                                <ItemsControl Grid.Column="0"
+                                        ItemsSource="{Binding IndentGuides}"
+                                        VerticalAlignment="Stretch">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="18" VerticalAlignment="Stretch">
+                                            <Border Width="1"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Stretch"
+                                                    Background="{StaticResource BorderBrush}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            
+                            <ToggleButton Grid.Column="1"
+                                        Classes="treeToggle"
+                                        Margin="3,0,5,0"
+                                        IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                        Opacity="{Binding IsDirectory}"
+                                        IsHitTestVisible="{Binding IsDirectory}">
+                                <TextBlock Classes="chevronGlyph" Text="&#8250;" />
+                            </ToggleButton>
 
-                        <Border Grid.Column="0" Width="1"
-                                VerticalAlignment="Stretch"
-                                Background="{StaticResource BorderBrush}"
-                                IsVisible="{Binding ShowGuideline}"/>
-
-                        <Border Grid.Column="1"
-                                HorizontalAlignment="Stretch" 
-                                Padding="0">
-                            <Grid ColumnDefinitions="14,*" 
-                                    ColumnSpacing="2">
-                                <TextBlock Grid.Column="0" 
-                                        Text="{Binding Icon}"
-                                        Foreground="{StaticResource TextSecondaryBrush}"
-                                        VerticalAlignment="Center" 
-                                        TextAlignment="Center"/>
-                                <Grid Grid.Column="1">
-                                    <TextBlock Text="{Binding Name}" 
-                                            IsVisible="{Binding !IsEditing}"
-                                            Foreground="{StaticResource TextPrimaryBrush}"
-                                            VerticalAlignment="Center"
-                                            DoubleTapped="OnNodeDoubleTapped" />
-                                    <TextBox Text="{Binding EditingName}" IsVisible="{Binding IsEditing}"
-                                            KeyDown="OnRenameTextBoxKeyDown" LostFocus="OnRenameTextBoxLostFocus" />
+                            <Border Grid.Column="2"
+                                    HorizontalAlignment="Stretch" 
+                                    Padding="0">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="2">
+                                    <Grid Grid.Column="0">
+                                        <TextBlock Text="{Binding Name}"
+                                                Margin="5,0"
+                                                Padding="0,5"
+                                                IsVisible="{Binding !IsEditing}"
+                                                Foreground="{StaticResource TextPrimaryBrush}"
+                                                VerticalAlignment="Center" 
+                                                DoubleTapped="OnNodeDoubleTapped"/>
+                                        <TextBox Text="{Binding EditingName}" IsVisible="{Binding IsEditing}"
+                                                KeyDown="OnRenameTextBoxKeyDown" LostFocus="OnRenameTextBoxLostFocus" />
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </Border>
-                    </Grid>
+                            </Border>
+                        </Grid>
+                    </Border>
+
                 </TreeDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

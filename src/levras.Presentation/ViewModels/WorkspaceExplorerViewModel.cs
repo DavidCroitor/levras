@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using levras.Core.Abstractions;
@@ -24,7 +25,11 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
     public event EventHandler<WorkspaceItemViewModel>? FileSelected;
     public event EventHandler<string>? NodeDeleted;
     public event EventHandler<(string oldPath, string newPath)>? NodePathChanged;
-    
+    [ObservableProperty]
+    private GridLength _width = new(240);
+
+    public double MinWidth { get; } = 200; 
+    public double MaxWidth { get; } = 650;
 
     public WorkspaceExplorerViewModel(
         IWorkspaceService workspaceService,
@@ -82,6 +87,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         {
             await _dialogService.ShowErrorAsync(ex.Message);
         }
+
     }
     public void SelectByPath(string filePath)
     {
@@ -197,6 +203,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
                 RemoveFromTree(node);
                 await _dialogService.ShowErrorAsync(ex.Message);
             }
+
             return;
         }
 
@@ -215,6 +222,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         {
             await _dialogService.ShowErrorAsync(ex.Message);
         }
+
     }
     [RelayCommand]
     private void CancelRename(WorkspaceItemViewModel node)
