@@ -5,24 +5,55 @@
              x:DataType="vm:WorkspaceExplorerViewModel"> 
 
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4" Margin="4">
-            <Button Content="New File" 
-                    Command="{Binding BeginCreateFileCommand}" 
-                    CommandParameter="{Binding SelectedItem}"
-                    IsEnabled="{Binding IsWorkspaceOpen}"
-                    IsVisible="{Binding IsWorkspaceOpen}"/>
-            <Button Content="New Folder" 
-                    Command="{Binding BeginCreateFolderCommand}" 
-                    CommandParameter="{Binding SelectedItem}"
-                    IsEnabled="{Binding IsWorkspaceOpen}"
-                    IsVisible="{Binding IsWorkspaceOpen}"/>
-        </StackPanel>
+        <Border DockPanel.Dock="Top"
+                Classes="explorerToolbar"
+                IsVisible="{Binding IsWorkspaceOpen}">
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="2">
+                    <Button Classes="explorerAction"
+                            Command="{Binding BeginCreateFileCommand}"
+                            CommandParameter="{Binding SelectedItem}"
+                            IsEnabled="{Binding IsWorkspaceOpen}"
+                            ToolTip.Tip="New File">
+                            <Image Width="18" Height="18" Source="avares://levras.Presentation/Assets/AddFileIcon.png" />
+                    </Button>
+                    <Button Classes="explorerAction"
+                            Command="{Binding BeginCreateFolderCommand}"
+                            CommandParameter="{Binding SelectedItem}"
+                            IsEnabled="{Binding IsWorkspaceOpen}"
+                            ToolTip.Tip="New Folder">
+                            <Image Width="18" Height="18" Source="avares://levras.Presentation/Assets/AddFolderIcon.png" />
+                    </Button>
+                </StackPanel>
 
-        <TreeView ItemsSource="{Binding RootItems}"
-                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-                  MinWidth="200">
+                <TextBlock Classes="explorerToolbarTitle"
+                           Text="{Binding WorkspaceTitle}"
+                           ToolTip.Tip="{Binding WorkspaceTitle}"
+                           TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center"/>
+            </DockPanel>
+            
+        </Border>
+        
+        <TreeView   x:Name="ExplorerTree"
+                    ItemsSource="{Binding RootItems}"
+                    SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                    MinWidth="200"
+                    DragDrop.AllowDrop="True"
+                    DragDrop.DragOver="OnTreeDragOver"
+                    DragDrop.Drop="OnTreeDrop">
             <TreeView.Styles>
+                <Style Selector="Border.treeRow.dropTarget">
+                    <Setter Property="Background" Value="{DynamicResource AccentBrushLow}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                </Style>
+                <Style Selector="Border.treeRow.dragging">
+                    <Setter Property="Opacity" Value="0.5" />
+                </Style>
                 <Style Selector="TreeViewItem" x:DataType="vm:WorkspaceItemViewModel">
+                    <Setter Property="DragDrop.AllowDrop" Value="True" />
+                    <Setter Property="Background" Value="Transparent" />
                     <Setter Property="Classes.activeFile" Value="{Binding ShowActiveIndicator}" />
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -30,12 +61,24 @@
                     <Setter Property="ContextMenu">
                         <Setter.Value>
                             <ContextMenu>
+                                <MenuItem Header="Create File"
+                                        Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).BeginCreateFileCommand}"
+                                        CommandParameter="{Binding}"
+                                        IsVisible="{Binding IsDirectory}"
+                                        IsEnabled="{Binding IsDirectory}" />
+
+                                <MenuItem Header="Create Folder"
+                                        Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).BeginCreateFolderCommand}"
+                                        CommandParameter="{Binding}"
+                                        IsVisible="{Binding IsDirectory}"
+                                        IsEnabled="{Binding IsDirectory}" />
                                 <MenuItem Header="Rename"
                                           Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).BeginRenameCommand}"
                                           CommandParameter="{Binding}" />
                                 <MenuItem Header="Delete"
                                           Command="{Binding $parent[TreeView].((vm:WorkspaceExplorerViewModel)DataContext).DeleteNodeCommand}"
                                           CommandParameter="{Binding}" />
+
                             </ContextMenu>
                         </Setter.Value>
                     </Setter>
@@ -43,9 +86,19 @@
             </TreeView.Styles>
             <TreeView.ItemTemplate>
                 <TreeDataTemplate ItemsSource="{Binding Children}">
-                    <Border Classes="treeRow" 
+                    <Border Classes="treeRow"
+                            Classes.dropTarget="{Binding IsDropTarget}"
+                            Classes.dragging="{Binding IsBeingDragged}"
                             HorizontalAlignment="Stretch"
-                            CornerRadius="{StaticResource RadiusSmall}">
+                            CornerRadius="{StaticResource RadiusSmall}"
+                            PointerPressed="OnRowPointerPressed"
+                            PointerMoved="OnRowPointerMoved"
+                            PointerReleased="OnRowPointerReleased"
+                            DragDrop.AllowDrop="True"
+                            DragDrop.DragEnter="OnRowDragEnter"
+                            DragDrop.DragOver="OnRowDragOver"
+                            DragDrop.DragLeave="OnRowDragLeave"
+                            DragDrop.Drop="OnRowDrop">
                         <Grid VerticalAlignment="Stretch" ColumnDefinitions="Auto,14,*">
                                 <ItemsControl Grid.Column="0"
                                         ItemsSource="{Binding IndentGuides}"
@@ -88,8 +141,10 @@
                                                 Foreground="{StaticResource TextPrimaryBrush}"
                                                 VerticalAlignment="Center" 
                                                 DoubleTapped="OnNodeDoubleTapped"/>
-                                        <TextBox Text="{Binding EditingName}" IsVisible="{Binding IsEditing}"
-                                                KeyDown="OnRenameTextBoxKeyDown" LostFocus="OnRenameTextBoxLostFocus" />
+                                        <TextBox Text="{Binding EditingName}" 
+                                                IsVisible="{Binding IsEditing}"
+                                                KeyDown="OnRenameTextBoxKeyDown" 
+                                                LostFocus="OnRenameTextBoxLostFocus" />
                                     </Grid>
                                 </Grid>
                             </Border>

@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using System;
+using Avalonia.Wayland;
 
 namespace levras.Presentation;
 
@@ -16,6 +17,8 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .With(new X11PlatformOptions{})
+            .UseWayland()
 #if DEBUG
             // .WithDeveloperTools()
 #endif

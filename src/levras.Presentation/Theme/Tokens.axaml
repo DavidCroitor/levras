@@ -10,6 +10,7 @@
     <SolidColorBrush x:Key="BorderStrongBrush" Color="{StaticResource Slate600}"/>
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource Slate700}"/>
     <SolidColorBrush x:Key="BorderSubtleBrush" Color="{StaticResource Slate800}"/>
+    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{StaticResource Accent500}"/>
 
     <!-- Text -->
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource Slate50}"/>
@@ -26,6 +27,10 @@
     <SolidColorBrush x:Key="EditorBackgroundBrush" Color="{StaticResource Slate900}"/>
     <SolidColorBrush x:Key="EditorForegroundBrush" Color="{StaticResource Slate100}"/>
     <SolidColorBrush x:Key="PreviewBackgroundBrush" Color="{StaticResource Slate800}"/>
+
+    <!-- Selected-text highlight in the code editor. Kept translucent so highlighted
+        syntax colors still show through, unlike an opaque UI-accent fill. -->
+    <SolidColorBrush x:Key="EditorSelectionBrush" Color="{StaticResource Accent600}" Opacity="0.35"/>
 
     <!-- Status -->
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource Danger500}"/>

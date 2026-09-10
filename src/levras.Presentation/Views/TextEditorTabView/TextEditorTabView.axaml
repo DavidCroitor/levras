@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:levras.Presentation.ViewModels"
-             xmlns:ae="using:AvaloniaEdit"
+             xmlns:avaloniaedit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:md="using:Markdown.Avalonia"
              x:Class="levras.Presentation.Views.TextEditorTabView"
              x:DataType="vm:TextEditorTabViewModel">
@@ -9,13 +9,24 @@
     <Grid ColumnDefinitions="*,4,*">
 
         <Border Grid.Column="0" Background="{StaticResource EditorBackgroundBrush}">
-            <ae:TextEditor Document="{Binding Document}"
+            <avaloniaedit:TextEditor
+                            x:Name="MainEditor"
+                            Document="{Binding Document}"
                             FontFamily="{StaticResource FontFamilyMono}"
                             FontSize="{StaticResource EditorFontSize}"
                             Foreground="{StaticResource EditorForegroundBrush}"
                             Background="Transparent"
-                            ShowLineNumbers="False"
-                            WordWrap="True"/>
+                            ShowLineNumbers="True"
+                            WordWrap="True">
+                <avaloniaedit:TextEditor.Options>
+                        <avaloniaedit:TextEditorOptions 
+                            EnableRectangularSelection="True" 
+                            EnableTextDragDrop="True"
+                            EnableHyperlinks="True"
+                            />
+                </avaloniaedit:TextEditor.Options>
+            </avaloniaedit:TextEditor>
+
         </Border>
 
         <GridSplitter Grid.Column="1"

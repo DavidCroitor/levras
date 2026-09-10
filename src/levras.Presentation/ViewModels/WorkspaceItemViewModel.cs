@@ -27,6 +27,8 @@ public partial class WorkspaceItemViewModel : ViewModelBase
     [ObservableProperty] private bool _isExpanded;
     [ObservableProperty] private bool _isEditing;
     [ObservableProperty] private string _editingName = string.Empty;
+    [ObservableProperty] private bool _isDropTarget;
+    [ObservableProperty] private bool _isBeingDragged;
     
     internal Action<WorkspaceItemViewModel>? SelectionRequested {get; set;}
 
