@@ -17,6 +17,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly IFolderPickerService _folderPickerService;
     public WorkspaceExplorerViewModel Explorer { get; }
     public ObservableCollection<TabViewModelBase> OpenTabs { get; } = new();
+    public ObservableCollection<string> RecentWorkspaces { get; } = new();
     [ObservableProperty] private TabViewModelBase? _selectedTab;
 
     public MainViewModel(
@@ -32,6 +33,8 @@ public partial class MainViewModel : ViewModelBase
         Explorer.FileSelected += OnFileSelected;
         Explorer.NodeDeleted += OnNodeDeleted;
         Explorer.NodePathChanged += OnNodePathChanged;
+
+        //TODO add to recent workspaces
     }
 
     private void OnNodePathChanged(object? sender, (string oldPath, string newPath) change)
@@ -52,7 +55,6 @@ public partial class MainViewModel : ViewModelBase
             }
         }
     }
-
     private void OnNodeDeleted(object? sender, string deletedPath)
     {
         var comparison = OperatingSystem.IsWindows()
@@ -72,7 +74,6 @@ public partial class MainViewModel : ViewModelBase
             SelectedTab = OpenTabs.LastOrDefault();
         }
     }
-
     private async void OnFileSelected(object? sender, WorkspaceItemViewModel node)
     {
         var existing = OpenTabs.FirstOrDefault(t => t.FilePath == node.FullPath);
@@ -89,7 +90,6 @@ public partial class MainViewModel : ViewModelBase
             Explorer.SelectByPath(value.FilePath);
         }
     }
-
     [RelayCommand]
     private async Task OpenWorkspaceAsync()
     {
@@ -110,13 +110,34 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task CloseTabAsync(TabViewModelBase tab)
     {
+        await TryCloseTabAsync(tab);
+    }
+
+    [RelayCommand]
+    private async Task CloseWorkspaceAsync()
+    {
+        foreach (var tab in OpenTabs.ToList())
+        {
+            if (!await TryCloseTabAsync(tab))
+            {
+                return;
+            }
+        }
+
+        Explorer.CloseWorkspace();
+    }
+
+    private async Task<bool> TryCloseTabAsync(TabViewModelBase tab)
+    {
         if (tab is TextEditorTabViewModel { IsDirty: true } editorTab && !await editorTab.TryPrepareToDiscardAsync())
-            return;
+        {
+            return false;
+        }
 
         OpenTabs.Remove(tab);
         if (SelectedTab == tab) SelectedTab = OpenTabs.LastOrDefault();
+        return true;
     }   
-
     [RelayCommand]
     private async Task SaveActiveTabAsync()
     {

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using AvaloniaEdit.Document;
 using levras.Presentation.ViewModels;

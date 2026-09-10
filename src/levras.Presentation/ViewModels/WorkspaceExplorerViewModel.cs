@@ -59,6 +59,15 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         }
         IsWorkspaceOpen = true;
     }
+
+    public void CloseWorkspace()
+    {
+        RootItems.Clear();
+        SelectedItem = null;
+        WorkspaceTitle = string.Empty;
+        IsWorkspaceOpen = false;
+    }
+
     [RelayCommand]
     private async Task MoveNodeAsync((WorkspaceItemViewModel Source, WorkspaceItemViewModel? Target) args)
     {

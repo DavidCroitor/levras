@@ -16,6 +16,9 @@
                 <MenuItem Header="_Workspace">
                     <MenuItem Header="_Open Workspace..."
                             Command="{Binding OpenWorkspaceCommand}" />
+                    <MenuItem Header="_Close Workspace"
+                            Command="{Binding CloseWorkspaceCommand}"
+                            IsVisible="{Binding Explorer.IsWorkspaceOpen}" />
                     <Separator />
                     <MenuItem Header="_Save"
                             Command="{Binding SaveActiveTabCommand}"
@@ -25,83 +28,87 @@
         </Border>
 
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition   Width="{Binding Explorer.Width, Mode=TwoWay }" 
-                                    MinWidth="{Binding Explorer.MinWidth}"
-                                    MaxWidth="{Binding Explorer.MaxWidth}"/>
-                <ColumnDefinition Width="1"/>
-                <ColumnDefinition Width="*" MinWidth="300" />
-            </Grid.ColumnDefinitions>
-            
-            <Border Grid.Column="0" 
-                    Background="{StaticResource SurfaceBrush}" 
-                    CornerRadius="5"
-                    BorderThickness="1"
-                    BorderBrush="{StaticResource BorderStrongBrush}"
-                    Margin="2,2,1,2">
-                <views:WorkspaceExplorerView DataContext="{Binding Explorer}" />
-            </Border>
-
-            <GridSplitter Grid.Column="1"
-                Background="Transparent"
-                ResizeDirection="Columns"/>
-            
-            <Border Grid.Column="2" 
-                    BorderThickness="1"
-                    CornerRadius="5"
-                    Margin="1,2,2,2"
-                    Padding="2"
-                    Background="{StaticResource EditorBackgroundBrush}"
-                    BorderBrush="{StaticResource BorderStrongBrush}">
-                <Grid
-                    Margin="2"
-                    Background="{StaticResource EditorBackgroundBrush}" >
-                    <TextBlock Text="Open a file to get started"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Foreground="{StaticResource TextSecondaryBrush}"
-                            IsVisible="{Binding !OpenTabs.Count}" />
-                    
-                    <TabControl ItemsSource="{Binding OpenTabs}"
-                                SelectedItem="{Binding SelectedTab}"
-                                IsVisible="{Binding OpenTabs.Count}"
-                                Background="Transparent">
-                        <TabControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" >
-                                    <Border Grid.Column="0"
-                                            Width="6" Height="6" CornerRadius="3"
-                                            Background="{StaticResource AccentBrush}"
-                                            VerticalAlignment="Center"
-                                            IsVisible="{Binding IsDirty}"/>
-
-                                    <TextBlock Grid.Column="1"
-                                            Text="{Binding Title}"
-                                            VerticalAlignment="Center"
-                                            Foreground="{StaticResource TextPrimaryBrush}"
-                                            TextTrimming="CharacterEllipsis"
-                                            ToolTip.Tip="{Binding Title}"/>
-
-                                    <Button Grid.Column="2"
-                                            Classes="tabClose"
-                                            Content="✕"
-                                            Command="{Binding $parent[TabControl].((vm:MainViewModel)DataContext).CloseTabCommand}"
-                                            CommandParameter="{Binding}"
-                                            HorizontalAlignment="Right" />
-                                </Grid>
-                            </DataTemplate>
-                        </TabControl.ItemTemplate>
-
-                        <TabControl.ContentTemplate>
-                            <DataTemplate>
-                                <ContentControl Content="{Binding}" />
-                            </DataTemplate>
-                        </TabControl.ContentTemplate>
-                    </TabControl>
+            <Grid IsVisible="{Binding Explorer.IsWorkspaceOpen}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition   Width="{Binding Explorer.Width, Mode=TwoWay }" 
+                                        MinWidth="{Binding Explorer.MinWidth}"
+                                        MaxWidth="{Binding Explorer.MaxWidth}"/>
+                    <ColumnDefinition Width="1"/>
+                    <ColumnDefinition Width="*" MinWidth="300" />
+                </Grid.ColumnDefinitions>
                 
-                </Grid>
-            
-            </Border>
+                <Border Grid.Column="0" 
+                        Background="{StaticResource SurfaceBrush}" 
+                        CornerRadius="5"
+                        BorderThickness="1"
+                        BorderBrush="{StaticResource BorderStrongBrush}"
+                        Margin="2,2,1,2">
+                    <views:WorkspaceExplorerView DataContext="{Binding Explorer}" />
+                </Border>
+
+                <GridSplitter Grid.Column="1"
+                    Background="Transparent"
+                    ResizeDirection="Columns"/>
+                
+                <Border Grid.Column="2" 
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Margin="1,2,2,2"
+                        Padding="2"
+                        Background="{StaticResource EditorBackgroundBrush}"
+                        BorderBrush="{StaticResource BorderStrongBrush}">
+                    <Grid
+                        Margin="2"
+                        Background="{StaticResource EditorBackgroundBrush}" >
+                        <TextBlock Text="Open a file to get started"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource TextSecondaryBrush}"
+                                IsVisible="{Binding !OpenTabs.Count}" />
+                        
+                        <TabControl ItemsSource="{Binding OpenTabs}"
+                                    SelectedItem="{Binding SelectedTab}"
+                                    IsVisible="{Binding OpenTabs.Count}"
+                                    Background="Transparent">
+                            <TabControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" >
+                                        <Border Grid.Column="0"
+                                                Width="6" Height="6" CornerRadius="3"
+                                                Background="{StaticResource AccentBrush}"
+                                                VerticalAlignment="Center"
+                                                IsVisible="{Binding IsDirty}"/>
+
+                                        <TextBlock Grid.Column="1"
+                                                Text="{Binding Title}"
+                                                VerticalAlignment="Center"
+                                                Foreground="{StaticResource TextPrimaryBrush}"
+                                                TextTrimming="CharacterEllipsis"
+                                                ToolTip.Tip="{Binding Title}"/>
+
+                                        <Button Grid.Column="2"
+                                                Classes="tabClose"
+                                                Content="✕"
+                                                Command="{Binding $parent[TabControl].((vm:MainViewModel)DataContext).CloseTabCommand}"
+                                                CommandParameter="{Binding}"
+                                                HorizontalAlignment="Right" />
+                                    </Grid>
+                                </DataTemplate>
+                            </TabControl.ItemTemplate>
+
+                            <TabControl.ContentTemplate>
+                                <DataTemplate>
+                                    <ContentControl Content="{Binding}" />
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
+                        </TabControl>
+                    
+                    </Grid>
+                
+                </Border>
+            </Grid>
+        
+            <views:WelcomeView IsVisible="{Binding !Explorer.IsWorkspaceOpen}"/>
         </Grid>
     </DockPanel>
 </Window>

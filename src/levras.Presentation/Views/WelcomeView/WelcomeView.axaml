@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:levras.Presentation.ViewModels"
+             x:Class="levras.Presentation.Views.WelcomeView"
+             x:DataType="vm:MainViewModel">
+
+    <Grid Background="{StaticResource EditorBackgroundBrush}">
+        <StackPanel HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" 
+                    MinWidth="300"
+                    Spacing="8">
+            
+            <TextBlock Text="levras" 
+                       FontSize="32" 
+                       FontFamily="{StaticResource FontFamilyUI}"
+                       FontWeight="SemiBold" 
+                       Foreground="{StaticResource TextPrimaryBrush}" 
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,16"/>
+            
+            <Button Content="Open Workspace..."
+                    Command="{Binding OpenWorkspaceCommand}"
+                    Background="{StaticResource AccentBrush}"
+                    Foreground="{StaticResource AccentForegroundBrush}"
+                    FontFamily="{StaticResource FontFamilyUI}"
+                    Padding="{StaticResource SpacingMedium}"
+                    CornerRadius="{StaticResource RadiusMedium}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Cursor="Hand">
+                <Button.Styles>
+                    <Style Selector="Button:pointerover">
+                        <Setter Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+                    </Style>
+                    <Style Selector="Button:pressed">
+                        <Setter Property="Background" Value="{StaticResource AccentPressedBrush}"/>
+                    </Style>
+                </Button.Styles>
+            </Button>
+                    
+            <TextBlock Text="Recent Workspaces" 
+                       FontSize="{StaticResource FontSizeDefault}" 
+                       FontFamily="{StaticResource FontFamilyUI}"
+                       Foreground="{StaticResource TextSecondaryBrush}" 
+                       Margin="0,16,0,0"
+                       HorizontalAlignment="Left"/>
+            
+            <ItemsControl ItemsSource="{Binding RecentWorkspaces}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding}" 
+                                Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).OpenWorkspaceCommand}"
+                                CommandParameter="{Binding}"
+                                Background="Transparent"
+                                Foreground="{StaticResource TextSecondaryBrush}"
+                                FontFamily="{StaticResource FontFamilyUI}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="{StaticResource SpacingSmall}"
+                                Margin="0,2"
+                                CornerRadius="{StaticResource RadiusSmall}"
+                                Cursor="Hand">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+</UserControl>
