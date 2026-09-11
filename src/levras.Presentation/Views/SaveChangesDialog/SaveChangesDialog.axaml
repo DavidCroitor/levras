@@ -5,17 +5,20 @@
         Width="380" Height="150"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
-        SizeToContent="Height">
-    <StackPanel Margin="20" Spacing="16">
+        SizeToContent="Height"
+        Background="{StaticResource SurfaceBrush}"
+        FontFamily="{StaticResource FontFamilyUI}">
+    <StackPanel Margin="{StaticResource SpacingLarge}" Spacing="16">
         <TextBlock x:Name="MessageText"
+                   Classes="dialogMessage"
                    TextWrapping="Wrap" />
 
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Spacing="8">
-            <Button Content="Save" Click="OnSaveClick" />
-            <Button Content="Discard" Click="OnDiscardClick" />
-            <Button Content="Cancel" Click="OnCancelClick" />
+            <Button Content="Save" Classes="dialogPrimary" Click="OnSaveClick" />
+            <Button Content="Discard" Classes="dialogDanger" Click="OnDiscardClick" />
+            <Button Content="Cancel" Classes="dialogSecondary" Click="OnCancelClick" />
         </StackPanel>
     </StackPanel>
 </Window>

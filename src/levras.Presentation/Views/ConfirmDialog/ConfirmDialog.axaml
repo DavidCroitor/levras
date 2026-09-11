@@ -8,8 +8,8 @@
     <StackPanel Margin="20" Spacing="16">
         <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-            <Button Content="Yes" Click="OnYesClick" />
-            <Button x:Name="NoButton" Content="No" Click="OnNoClick" />
+            <Button Content="Yes" Classes="dialogPrimary" Click="OnYesClick" />
+            <Button x:Name="NoButton" Content="No" Classes="dialogDanger" Click="OnNoClick" />
         </StackPanel>
     </StackPanel>
 </Window>

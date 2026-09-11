@@ -118,7 +118,11 @@ public sealed class WorkspaceService : IWorkspaceService
         }
         WorkspaceFileNameValidator.EnsureValid(fileName);
 
-        var fullPath = Path.Combine(parentDirectoryPath, fileName);
+        var extension = Path.GetExtension(fileName);
+        var normalizedPath = string.IsNullOrEmpty(extension) 
+                            ? Path.ChangeExtension(fileName, ".md")
+                            : fileName;
+        var fullPath = Path.Combine(parentDirectoryPath, normalizedPath);
         if (await _fileSystemService.FileExistsAsync(fullPath) || await _fileSystemService.DirectoryExistsAsync(fullPath))
         {
             throw new NodeAlreadyExistsException(fullPath);
@@ -243,7 +247,7 @@ public sealed class WorkspaceService : IWorkspaceService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var name = Path.GetFileName(entryPath);
+            var name = Path.GetFileNameWithoutExtension(entryPath);
             var isDirectory = Directory.Exists(entryPath);
 
             if(isDirectory)

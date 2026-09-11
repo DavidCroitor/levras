@@ -24,7 +24,7 @@ public partial class TextEditorTabViewModel : TabViewModelBase
         string filePath,
         IWorkspaceService workspaceService,
         IDialogService dialogService
-    ) : base( filePath, Path.GetFileName(filePath))
+    ) : base( filePath, Path.GetFileNameWithoutExtension(filePath))
     {
         _workspaceService = workspaceService;
         _dialogService = dialogService;

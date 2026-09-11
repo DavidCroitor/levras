@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-<!-- True Neutral scale: 950 = near-black, 50 = near-white -->
+    <!-- True Neutral scale: 950 = near-black, 50 = near-white -->
     <Color x:Key="Slate950">#0A0A0A</Color>
     <Color x:Key="Slate900">#171717</Color>
     <Color x:Key="Slate800">#262626</Color>
@@ -14,12 +14,12 @@
     <Color x:Key="Slate100">#F5F5F5</Color>
     <Color x:Key="Slate50">#FAFAFA</Color>
 
-    <!-- Emerald accent: hover / base / pressed -->
-    <Color x:Key="Accent500">#10B981</Color>
-    <Color x:Key="Accent600">#059669</Color>
-    <Color x:Key="Accent700">#047857</Color>
+    <!-- Muted Red accent: hover / base / pressed -->
+    <Color x:Key="Accent500">#E06C75</Color> <!-- Soft coral red for hover -->
+    <Color x:Key="Accent600">#BE5046</Color> <!-- Muted brick red for the primary 10% accent -->
+    <Color x:Key="Accent700">#9E3F38</Color> <!-- Deeper red for pressed states -->
 
-    <!-- Reserved for states -->
-    <Color x:Key="Danger500">#E5484D</Color>
+    <!-- Reserved for states: distinct, brighter red for actual errors -->
+    <Color x:Key="Danger500">#FF2A2A</Color> 
 
 </ResourceDictionary>
