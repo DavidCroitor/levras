@@ -126,6 +126,33 @@ public partial class MainViewModel : ViewModelBase
 
         Explorer.CloseWorkspace();
     }
+    [RelayCommand]
+    private async Task CreateNewWorkspaceAsync()
+    {
+        try
+        {
+            var parentPath = await _folderPickerService.PickFolderAsync();
+            if(parentPath is null)
+            {
+                return;
+            }
+
+            var name = await _dialogService.PromptNameAsync(
+                "Create new workspace",
+                "Workspace name:");
+
+            if(string.IsNullOrEmpty(name))
+            {
+                return;
+            }
+
+            await Explorer.CreateNewWorkspaceAsync(parentPath, name);
+        }
+        catch(WorkspaceIoException ex)
+        {
+            await _dialogService.ShowErrorAsync(ex.Message);
+        }
+    }
 
     private async Task<bool> TryCloseTabAsync(TabViewModelBase tab)
     {

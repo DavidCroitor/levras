@@ -45,10 +45,22 @@ public sealed class DialogService : IDialogService
 
         await dialog.ShowDialog<bool>(owner);
     }
+    public async Task<string?> PromptNameAsync(string title, string message, string defaultValue = "New Folder")
+    {
+        var owner = GetMainWindow();
+        var dialog = new NameDialog(title, message, defaultValue);
+        if(owner is null)
+        {
+            return await dialog.ShowDialog<string?>(new Window());
+        }
+        return await dialog.ShowDialog<string?>(owner);
+    }
 
     private Window? GetMainWindow()
     {
         return Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop 
                 ? desktop.MainWindow : null;
     }
+
+
 }

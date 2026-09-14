@@ -55,6 +55,20 @@ public sealed class WorkspaceService : IWorkspaceService
         CurrentWorkspacePath = fullPath;
     }
 
+    public async Task<string> CreateWorkspaceAsync(string parentPath, string name, CancellationToken cancellationToken = default)
+    {
+        WorkspaceFileNameValidator.EnsureValid(name);
+        
+        var fullPath = Path.Combine(parentPath, name);
+        if(await _fileSystemService.DirectoryExistsAsync(fullPath) || await _fileSystemService.FileExistsAsync(fullPath))
+        {
+            throw new NodeAlreadyExistsException(fullPath);
+        }
+
+        await _fileSystemService.CreateDirectoryAsync(fullPath);
+        return fullPath;
+
+    }
     public async Task<string> ReadFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         if(!IsPathWithinWorkspace(filePath))
@@ -146,7 +160,7 @@ public sealed class WorkspaceService : IWorkspaceService
         WorkspaceFileNameValidator.EnsureValid(folderName);
 
         var fullPath = Path.Combine(parentDirectoryPath, folderName);
-        if (await _fileSystemService.FileExistsAsync(fullPath) || await _fileSystemService.DirectoryExistsAsync(fullPath))
+        if(await _fileSystemService.DirectoryExistsAsync(fullPath) || await _fileSystemService.FileExistsAsync(fullPath))
         {
             throw new NodeAlreadyExistsException(fullPath);
         }
@@ -276,5 +290,6 @@ public sealed class WorkspaceService : IWorkspaceService
         var extension = Path.GetExtension(entryPath);
         return WorkspaceFileTypeClassifier.IsAllowedExtension(extension);
     }
+
 
 }

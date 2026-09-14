@@ -22,6 +22,7 @@
                     Command="{Binding OpenWorkspaceCommand}"
                     Classes="welcomePrimary"/>
             <Button Content="Create New Workspace"
+                    Command="{Binding CreateNewWorkspaceCommand}"
                     Classes="welcomeSecondary"/>
                     
             <TextBlock Text="Recent Workspaces" 

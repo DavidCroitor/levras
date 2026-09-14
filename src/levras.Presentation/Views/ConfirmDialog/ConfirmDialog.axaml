@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="levras.Presentation.Views.ConfirmDialog"
         Width="380" Height="150"
+        Background="{StaticResource EditorBackgroundBrush}"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         SizeToContent="Height">

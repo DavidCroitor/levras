@@ -98,11 +98,12 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
             await _dialogService.ShowErrorAsync(ex.Message);
         }
     }
- 
-    /// <summary>
-    /// Whether <paramref name="source"/> may be dropped onto <paramref name="target"/>.
-    /// A null target means "drop at the workspace root".
-    /// </summary>
+
+    public async Task CreateNewWorkspaceAsync(string parentPath, string name)
+    {
+        var workspacePath = await _workspaceService.CreateWorkspaceAsync(parentPath, name);
+        await LoadWorkspaceAsync(workspacePath);
+    }
     public bool CanMoveNode(WorkspaceItemViewModel source, WorkspaceItemViewModel? target)
     {
         if (source == target) return false;

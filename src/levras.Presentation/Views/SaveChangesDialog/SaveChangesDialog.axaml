@@ -6,7 +6,7 @@
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         SizeToContent="Height"
-        Background="{StaticResource SurfaceBrush}"
+        Background="{StaticResource EditorBackgroundBrush}"
         FontFamily="{StaticResource FontFamilyUI}">
     <StackPanel Margin="{StaticResource SpacingLarge}" Spacing="16">
         <TextBlock x:Name="MessageText"
