@@ -9,20 +9,27 @@
         Width="1600" Height="1000"
         Background="{StaticResource Slate800}"
         FontFamily="{StaticResource FontFamilyUI}">
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+W"
+                    Command="{Binding CloseTabCommand}"
+                    CommandParameter="{Binding SelectedTab}"/>
+    </Window.KeyBindings>
 
     <DockPanel>
         <Border DockPanel.Dock="Top" Background="Transparent">
             <Menu>
                 <MenuItem Header="_Workspace">
                     <MenuItem Header="_Open Workspace..."
-                            Command="{Binding OpenWorkspaceCommand}" />
+                            Command="{Binding OpenWorkspaceCommand}"/>
                     <MenuItem Header="_Close Workspace"
                             Command="{Binding CloseWorkspaceCommand}"
                             IsVisible="{Binding Explorer.IsWorkspaceOpen}" />
                     <Separator />
                     <MenuItem Header="_Save"
                             Command="{Binding SaveActiveTabCommand}"
-                            IsVisible="{Binding OpenTabs.Count}"/>
+                            IsVisible="{Binding OpenTabs.Count}"
+                            IsEnabled="{Binding OpenTabs.Count}"
+                            HotKey="Ctrl+S"/>
                 </MenuItem>
             </Menu>
         </Border>
