@@ -53,19 +53,19 @@ public partial class WorkspaceExplorerView : UserControl
     {
         if (sender is not Control control)
         {
-            Debug.WriteLine("[DragDrop] PointerPressed ignored: sender is not a Control.");
+            // Debug.WriteLine("[DragDrop] PointerPressed ignored: sender is not a Control.");
             return;
         }
         if (!e.GetCurrentPoint(control).Properties.IsLeftButtonPressed)
         {
-            Debug.WriteLine("[DragDrop] PointerPressed ignored: left button is not pressed.");
+            // Debug.WriteLine("[DragDrop] PointerPressed ignored: left button is not pressed.");
             return;
         }
 
         // Don't start a drag out from under an active rename textbox.
         if (control.DataContext is not WorkspaceItemViewModel { IsEditing: false } node)
         {
-            Debug.WriteLine("[DragDrop] PointerPressed ignored: row has no editable node.");
+            // Debug.WriteLine("[DragDrop] PointerPressed ignored: row has no editable node.");
             return;
         }
 
@@ -73,7 +73,7 @@ public partial class WorkspaceExplorerView : UserControl
         _dragCandidate = node;
         _dragPressArgs = e;
         _dragInProgress = false;
-        Debug.WriteLine($"[DragDrop] Candidate selected: {node.Name}.");
+        // Debug.WriteLine($"[DragDrop] Candidate selected: {node.Name}.");
     }
 
     private async void OnRowPointerMoved(object? sender, PointerEventArgs e)
@@ -164,7 +164,7 @@ public partial class WorkspaceExplorerView : UserControl
     {
         if ((sender as Control)?.DataContext is not WorkspaceItemViewModel targetNode)
         {
-            Debug.WriteLine("[DragDrop] Row DragOver ignored: target has no node data.");
+            // Debug.WriteLine("[DragDrop] Row DragOver ignored: target has no node data.");
             e.DragEffects = DragDropEffects.None;
             return;
         }

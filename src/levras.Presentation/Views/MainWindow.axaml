@@ -6,14 +6,9 @@
         x:DataType="vm:MainViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="levras"
-        Width="1600" Height="1000"
+        Width="1920" Height="1080"
         Background="{StaticResource Slate800}"
         FontFamily="{StaticResource FontFamilyUI}">
-    <Window.KeyBindings>
-        <KeyBinding Gesture="Ctrl+W"
-                    Command="{Binding CloseTabCommand}"
-                    CommandParameter="{Binding SelectedTab}"/>
-    </Window.KeyBindings>
 
     <DockPanel>
         <Border DockPanel.Dock="Top" Background="Transparent">
@@ -26,10 +21,16 @@
                             IsVisible="{Binding Explorer.IsWorkspaceOpen}" />
                     <Separator />
                     <MenuItem Header="_Save"
+                            HotKey="Ctrl+S"
                             Command="{Binding SaveActiveTabCommand}"
                             IsVisible="{Binding OpenTabs.Count}"
-                            IsEnabled="{Binding OpenTabs.Count}"
-                            HotKey="Ctrl+S"/>
+                            IsEnabled="{Binding OpenTabs.Count}"/>
+                    <MenuItem Header="_Close"
+                            Command="{Binding CloseTabCommand}"
+                            CommandParameter="{Binding SelectedTab}"
+                            IsVisible="{Binding OpenTabs.Count}"
+                            IsEnabled="{Binding OpenTabs.Count}"/>
+                    
                 </MenuItem>
             </Menu>
         </Border>

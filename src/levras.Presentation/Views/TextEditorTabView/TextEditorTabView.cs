@@ -18,7 +18,7 @@ public partial class TextEditorTabView : UserControl
             if (Application.Current?.TryGetResource("EditorSelectionBrush", out var resource) == true &&
                 resource is IBrush selectionBrush)
             {
-                editor.TextArea.SelectionBrush = selectionBrush;
+                editor?.TextArea.SelectionBrush = selectionBrush;
             }
         };
     

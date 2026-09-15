@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -107,10 +108,20 @@ public partial class MainViewModel : ViewModelBase
             await _dialogService.ShowErrorAsync(ex.Message);
         }
     }
-    [RelayCommand]
-    private async Task CloseTabAsync(TabViewModelBase tab)
+    [RelayCommand(
+            CanExecute = nameof(CanCloseTab),
+            AllowConcurrentExecutions = false)]
+    private async Task CloseTabAsync(TabViewModelBase? tab)
     {
-        await TryCloseTabAsync(tab);
+        Debug.WriteLine($"Fired at {DateTime.Now}");
+        if(tab is null) return;
+        Debug.WriteLine($"[{DateTime.Now}] Tab: {tab.Title} -- IsDirty:{tab.IsDirty}");
+        await TryCloseTabAsync(tab);   
+    }
+    private bool CanCloseTab(TabViewModelBase? tab)
+    {
+        Debug.WriteLine($"CanCloseTab: {tab?.Title ?? "<null>"}");
+        return tab is not null;
     }
 
     [RelayCommand]
@@ -164,7 +175,7 @@ public partial class MainViewModel : ViewModelBase
         OpenTabs.Remove(tab);
         if (SelectedTab == tab) SelectedTab = OpenTabs.LastOrDefault();
         return true;
-    }   
+    }
     [RelayCommand]
     private async Task SaveActiveTabAsync()
     {
