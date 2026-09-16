@@ -88,10 +88,12 @@ public partial class MainViewModel : ViewModelBase
     }
     partial void OnSelectedTabChanged(TabViewModelBase? value)
     {
-        if(value is not null)
+        if(value is null)
         {
-            Explorer.SelectByPath(value.FilePath);
+            Explorer.SelectedItem = null;
+            return;
         }
+            Explorer.SelectByPath(value.FilePath);
     }
     [RelayCommand]
     private async Task OpenWorkspaceAsync()
