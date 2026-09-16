@@ -8,8 +8,9 @@
         Title="levras"
         Width="1920" Height="1080"
         Background="{StaticResource Slate800}"
-        FontFamily="{StaticResource FontFamilyUI}">
-
+        FontFamily="{StaticResource FontFamilyUI}"
+        KeyDown="OnKeyDown"
+        KeyUp="OnKeyUp">
     <DockPanel>
         <Border DockPanel.Dock="Top" Background="Transparent">
             <Menu>
@@ -23,11 +24,6 @@
                     <MenuItem Header="_Save"
                             HotKey="Ctrl+S"
                             Command="{Binding SaveActiveTabCommand}"
-                            IsVisible="{Binding OpenTabs.Count}"
-                            IsEnabled="{Binding OpenTabs.Count}"/>
-                    <MenuItem Header="_Close"
-                            Command="{Binding CloseTabCommand}"
-                            CommandParameter="{Binding SelectedTab}"
                             IsVisible="{Binding OpenTabs.Count}"
                             IsEnabled="{Binding OpenTabs.Count}"/>
                     

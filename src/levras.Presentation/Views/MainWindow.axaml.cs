@@ -1,49 +1,37 @@
-using System;
-using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using levras.Presentation.ViewModels;
 
 namespace levras.Presentation.Views;
 
 public partial class MainWindow : Window
 {
-    private bool _closeTabKeyHeld;
-
+    private bool _ctrlWPressed;
     public MainWindow()
     {
         InitializeComponent();
-
-        AddHandler(KeyDownEvent, OnCloseTabKeyDown, RoutingStrategies.Tunnel);
-        AddHandler(KeyUpEvent, OnCloseTabKeyUp, RoutingStrategies.Tunnel);
     }
 
-    private void OnCloseTabKeyDown(object? sender, KeyEventArgs e)
+    private void OnKeyUp(object? sender, KeyEventArgs e)
     {
-        if (e.Key != Key.W || e.KeyModifiers != KeyModifiers.Control)
-            return;
+        if(e.Key != Key.W || !e.KeyModifiers.HasFlag(KeyModifiers.Control)) return;
 
-        // Swallow every auto-repeat KeyDown for the same held press.
         e.Handled = true;
 
-        if (_closeTabKeyHeld)
-            return;
+        if(_ctrlWPressed) return;
 
-        _closeTabKeyHeld = true;
+        _ctrlWPressed = true;
 
-        if (DataContext is MainViewModel vm &&
-            vm.CloseTabCommand.CanExecute(vm.SelectedTab))
+        if(DataContext is MainViewModel viewModel && viewModel.CloseTabCommand.CanExecute(viewModel.SelectedTab))
         {
-            vm.CloseTabCommand.Execute(vm.SelectedTab);
+            viewModel.CloseTabCommand.Execute(viewModel.SelectedTab);
         }
     }
-
-    private void OnCloseTabKeyUp(object? sender, KeyEventArgs e)
+    private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.W || e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+        if(e.Key is Key.W or Key.LeftCtrl or Key.RightCtrl)
         {
-            _closeTabKeyHeld = false;
+            _ctrlWPressed = false;
         }
     }
 }

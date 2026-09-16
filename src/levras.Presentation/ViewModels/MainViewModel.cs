@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using levras.Core.Exceptions;
@@ -20,6 +21,7 @@ public partial class MainViewModel : ViewModelBase
     public ObservableCollection<TabViewModelBase> OpenTabs { get; } = new();
     public ObservableCollection<string> RecentWorkspaces { get; } = new();
     [ObservableProperty] private TabViewModelBase? _selectedTab;
+    private bool _isClosingTab;
 
     public MainViewModel(
             WorkspaceExplorerViewModel explorer,
@@ -108,21 +110,23 @@ public partial class MainViewModel : ViewModelBase
             await _dialogService.ShowErrorAsync(ex.Message);
         }
     }
-    [RelayCommand(
-            CanExecute = nameof(CanCloseTab),
-            AllowConcurrentExecutions = false)]
+    
+    [RelayCommand(CanExecute = nameof(CanCloseTab))]
     private async Task CloseTabAsync(TabViewModelBase? tab)
     {
-        Debug.WriteLine($"Fired at {DateTime.Now}");
-        if(tab is null) return;
-        Debug.WriteLine($"[{DateTime.Now}] Tab: {tab.Title} -- IsDirty:{tab.IsDirty}");
-        await TryCloseTabAsync(tab);   
+        if (tab is null || _isClosingTab) return;
+        _isClosingTab = true;
+        try
+        {
+            await TryCloseTabAsync(tab);
+        }
+        finally
+        {
+            _isClosingTab = false;
+        }
     }
-    private bool CanCloseTab(TabViewModelBase? tab)
-    {
-        Debug.WriteLine($"CanCloseTab: {tab?.Title ?? "<null>"}");
-        return tab is not null;
-    }
+
+    private bool CanCloseTab(TabViewModelBase? tab) => tab is not null && !_isClosingTab;
 
     [RelayCommand]
     private async Task CloseWorkspaceAsync()
