@@ -1,15 +1,24 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="levras.Presentation.Views.ErrorDialog"
+        Title="Error"
         Width="380" Height="150"
         Background="{StaticResource EditorBackgroundBrush}"
-        WindowStartupLocation="CenterOwner"
-        CanResize="False"
-        SizeToContent="Height">
-    <StackPanel Margin="20" Spacing="16">
-        <TextBlock x:Name="MessageText" Classes="dialogMessage" TextWrapping="Wrap" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-            <Button Content="Ok" Classes="dialogPrimary" Click="OnOkClick" />
+        WindowStartupLocation="CenterScreen"
+        WindowDecorations="None"
+        ExtendClientAreaToDecorationsHint="True">
+
+    <Grid RowDefinitions="16,*">
+        <Border Grid.Row="0"
+                Background="Transparent"
+                WindowDecorationProperties.ElementRole="TitleBar" />
+        <StackPanel Grid.Row="1" Margin="20" Spacing="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="MessageText" Classes="dialogMessage" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <Button Content="Ok" Classes="dialogPrimary" Click="OnOkClick" />
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </Grid>
+
+
 </Window>

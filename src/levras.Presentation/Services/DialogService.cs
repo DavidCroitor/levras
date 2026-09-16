@@ -34,7 +34,7 @@ public sealed class DialogService : IDialogService
     public async Task ShowErrorAsync(string message)
     {
         var owner = GetMainWindow();
-        var dialog = new ErrorDialog("Error", message);
+        var dialog = new ErrorDialog(message);
 
         if (owner is null)
         {

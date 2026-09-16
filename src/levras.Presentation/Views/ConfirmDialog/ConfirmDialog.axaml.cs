@@ -7,6 +7,7 @@ public partial class ConfirmDialog : Window
     public ConfirmDialog()
     {
         InitializeComponent();
+        CanResize = false;
     }
     public ConfirmDialog(string title, string message): this ()
     {

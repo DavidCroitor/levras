@@ -7,7 +7,7 @@ namespace levras.Core.Exceptions;
 public sealed class PathOutsideWorkspaceException : WorkspaceIoException
 {
     public PathOutsideWorkspaceException(string path, Exception? innerException = null)
-        : base(path, $"Path is outside the current workspace: '{path}'", innerException)
+        : base(path, $"Path is outside the current workspace: '{NameOf(path)}'", innerException)
     {
     }
 }
