@@ -38,7 +38,7 @@
     <!-- Application menu bar -->
     <Style Selector="Menu">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Padding" Value="2"/>
+        <Setter Property="Padding" Value="4,2"/>
         <Setter Property="Margin" Value="4,0" />
     </Style>
 
@@ -47,7 +47,7 @@
         <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource FontFamilyUI}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeSmall}"/>
-        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="Padding" Value="4"/>
         <Setter Property="Margin" Value="1"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}"/>
     </Style>
@@ -369,6 +369,25 @@
     <Style Selector="Button.welcomeRecent:pointerover">
         <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="Button.captionButton">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="Button.captionButton:pointerover">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+    </Style>
+    <Style Selector="Button.captionButtonClose:pointerover">
+        <Setter Property="Background" Value="#E81123" />
+        <Setter Property="Foreground" Value="White" />
     </Style>
 
 </Styles>

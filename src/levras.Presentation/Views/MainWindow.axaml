@@ -9,26 +9,51 @@
         Width="1920" Height="1080"
         Background="{StaticResource Slate800}"
         FontFamily="{StaticResource FontFamilyUI}"
+        WindowDecorations="None"
+        ExtendClientAreaToDecorationsHint="True"
         KeyDown="OnKeyDown"
         KeyUp="OnKeyUp">
     <DockPanel>
-        <Border DockPanel.Dock="Top" Background="Transparent">
-            <Menu>
-                <MenuItem Header="_Workspace">
-                    <MenuItem Header="_Open Workspace..."
-                            Command="{Binding OpenWorkspaceCommand}"/>
-                    <MenuItem Header="_Close Workspace"
-                            Command="{Binding CloseWorkspaceCommand}"
-                            IsVisible="{Binding Explorer.IsWorkspaceOpen}" />
-                    <Separator />
-                    <MenuItem Header="_Save"
-                            HotKey="Ctrl+S"
-                            Command="{Binding SaveActiveTabCommand}"
-                            IsVisible="{Binding OpenTabs.Count}"
-                            IsEnabled="{Binding OpenTabs.Count}"/>
-                    
-                </MenuItem>
-            </Menu>
+        <Border DockPanel.Dock="Top"
+                Background="Transparent"
+                WindowDecorationProperties.ElementRole="TitleBar">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Menu Grid.Column="0" 
+                        HorizontalAlignment="Left"
+                        WindowDecorationProperties.ElementRole="DecorationsElement" >
+                    <MenuItem Header="_Workspace">
+                        <MenuItem Header="_Open Workspace..."
+                                Command="{Binding OpenWorkspaceCommand}"/>
+                        <MenuItem Header="_Close Workspace"
+                                Command="{Binding CloseWorkspaceCommand}"
+                                IsVisible="{Binding Explorer.IsWorkspaceOpen}" />
+                        <Separator />
+                        <MenuItem Header="_Save"
+                                HotKey="Ctrl+S"
+                                Command="{Binding SaveActiveTabCommand}"
+                                IsVisible="{Binding OpenTabs.Count}"
+                                IsEnabled="{Binding OpenTabs.Count}"/>
+
+                    </MenuItem>
+                </Menu>
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="0">
+                    <Button Content="—"
+                            Classes="captionButton"
+                            WindowDecorationProperties.ElementRole="MinimizeButton"
+                            Click="OnMinimizeClick" />
+                    <Button Content="☐"
+                            Classes="captionButton"
+                            WindowDecorationProperties.ElementRole="MaximizeButton" 
+                            Click="OnMaximizeRestoreClick"/>
+                    <Button Content="✕"
+                            Classes="captionButton captionButtonClose"
+                            WindowDecorationProperties.ElementRole="CloseButton"
+                            Click="OnCloseClick"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <Grid>
