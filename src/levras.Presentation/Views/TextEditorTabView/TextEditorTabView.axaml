@@ -35,7 +35,8 @@
 
         <Border Grid.Column="2" Background="{StaticResource PreviewBackgroundBrush}">
             <mv:MarkdownViewer Markdown="{Binding MarkdownText}"
-                                      Margin="{StaticResource SpacingMedium}" />
+                                Margin="{StaticResource SpacingMedium}"
+                                />
         </Border>
 
     </Grid>

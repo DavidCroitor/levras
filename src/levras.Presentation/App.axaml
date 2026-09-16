@@ -26,6 +26,7 @@
 
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://MarkView.Avalonia/Themes/MarkdownTheme.axaml" />
         <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
         <StyleInclude Source="avares://levras.Presentation/Theme/Styles.axaml"/>
     </Application.Styles>
