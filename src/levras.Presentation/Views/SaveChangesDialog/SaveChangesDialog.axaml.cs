@@ -8,9 +8,10 @@ public partial class SaveChangesDialog : Window
     public SaveChangesDialog()
     {
         InitializeComponent();
+        CanResize = false;
     }
 
-    public SaveChangesDialog(string fileName): this()
+    public SaveChangesDialog(string fileName) : this()
     {
         MessageText.Text = $"\"{fileName}\" has unsaved changes. Do you want to save them?";
     }

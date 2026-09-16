@@ -20,9 +20,11 @@
             
             <Button Content="Open Workspace"
                     Command="{Binding OpenWorkspaceCommand}"
+                    Foreground="{StaticResource Slate300}" 
                     Classes="welcomePrimary"/>
             <Button Content="Create New Workspace"
                     Command="{Binding CreateNewWorkspaceCommand}"
+                    Foreground="{StaticResource Slate300}" 
                     Classes="welcomeSecondary"/>
                     
             <TextBlock Text="Recent Workspaces" 

@@ -4,21 +4,29 @@
         Title="Unsaved Changes"
         Width="380" Height="150"
         WindowStartupLocation="CenterOwner"
-        CanResize="False"
-        SizeToContent="Height"
         Background="{StaticResource EditorBackgroundBrush}"
-        FontFamily="{StaticResource FontFamilyUI}">
-    <StackPanel Margin="{StaticResource SpacingLarge}" Spacing="16">
-        <TextBlock x:Name="MessageText"
-                   Classes="dialogMessage"
-                   TextWrapping="Wrap" />
+        FontFamily="{StaticResource FontFamilyUI}"
+        WindowDecorations="None"
+        ExtendClientAreaToDecorationsHint="True">
 
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    Spacing="8">
-            <Button Content="Save" Classes="dialogPrimary" Click="OnSaveClick" />
-            <Button Content="Discard" Classes="dialogDanger" Click="OnDiscardClick" />
-            <Button Content="Cancel" Classes="dialogSecondary" Click="OnCancelClick" />
-        </StackPanel>
-    </StackPanel>
+    <Grid RowDefinitions="16,*">
+        <Border Grid.Row="0"
+                Background="Transparent"
+                WindowDecorationProperties.ElementRole="TitleBar" />
+        <Border Grid.Row="1" Background="{StaticResource EditorBackgroundBrush}">
+            <StackPanel Margin="{StaticResource SpacingLarge}" Spacing="16">
+                <TextBlock x:Name="MessageText"
+                        Classes="dialogMessage"
+                        TextWrapping="Wrap" />
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="8">
+                    <Button Content="Save" Classes="dialogPrimary" Click="OnSaveClick" />
+                    <Button Content="Discard" Classes="dialogDanger" Click="OnDiscardClick" />
+                    <Button Content="Cancel" Classes="dialogSecondary" Click="OnCancelClick" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
 </Window>

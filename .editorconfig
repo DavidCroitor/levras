@@ -1,0 +1,4 @@
+[*.cs]
+
+# AVALONIA_WAYLAND_FORCE_CSD: Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+dotnet_diagnostic.AVALONIA_WAYLAND_FORCE_CSD.severity = none

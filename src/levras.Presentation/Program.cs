@@ -18,6 +18,11 @@ sealed class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .UseWayland()
+            .With(new WaylandPlatformOptions
+                {
+                    ForceDrawnDecorations = true
+                }
+            )
 #if DEBUG
             // .WithDeveloperTools()
 #endif

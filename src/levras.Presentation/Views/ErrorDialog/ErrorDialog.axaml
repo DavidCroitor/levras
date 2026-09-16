@@ -7,7 +7,7 @@
         CanResize="False"
         SizeToContent="Height">
     <StackPanel Margin="20" Spacing="16">
-        <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
+        <TextBlock x:Name="MessageText" Classes="dialogMessage" TextWrapping="Wrap" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button Content="Ok" Classes="dialogPrimary" Click="OnOkClick" />
         </StackPanel>
