@@ -279,6 +279,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         }
         else
         {
+            parent.IsExpanded = true;
             parent.Children.Insert(0, placeholder);
         }
 
@@ -287,6 +288,7 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
     [RelayCommand]
     private void BeginRename(WorkspaceItemViewModel node)
     {
+        if (node is null || node.IsEditing || _pendingCreate is not null) return;
         node.EditingName = node.Name;
         node.IsEditing = true;
     }
@@ -352,7 +354,10 @@ public partial class WorkspaceExplorerViewModel : ViewModelBase
         var siblings = oldNode.Parent?.Children ?? RootItems;
         siblings.Remove(oldNode);
  
-        var newVm = new WorkspaceItemViewModel(newItem, oldNode.Parent);
+        var newVm = new WorkspaceItemViewModel(newItem, oldNode.Parent)
+        {
+            IsExpanded = oldNode.IsExpanded
+        };
         var index = GetSortedInsertIndex(siblings, newItem.IsDirectory, newItem.Name);
         siblings.Insert(index, newVm);
     }

@@ -3,6 +3,11 @@
              xmlns:vm="using:levras.Presentation.ViewModels"
              x:Class="levras.Presentation.Views.WorkspaceExplorerView"
              x:DataType="vm:WorkspaceExplorerViewModel"> 
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="F2"
+                    Command="{Binding BeginRenameCommand}"
+                    CommandParameter="{Binding SelectedItem}" />
+    </UserControl.KeyBindings>
 
     <DockPanel>
         <Border DockPanel.Dock="Top"
@@ -143,6 +148,7 @@
                                                 DoubleTapped="OnNodeDoubleTapped"/>
                                         <TextBox Text="{Binding EditingName}" 
                                                 IsVisible="{Binding IsEditing}"
+                                                Initialized="OnRenameTextBoxInitialized"
                                                 KeyDown="OnRenameTextBoxKeyDown" 
                                                 LostFocus="OnRenameTextBoxLostFocus" />
                                     </Grid>

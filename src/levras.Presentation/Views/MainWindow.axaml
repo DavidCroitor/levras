@@ -13,6 +13,9 @@
         ExtendClientAreaToDecorationsHint="True"
         KeyDown="OnKeyDown"
         KeyUp="OnKeyUp">
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveActiveTabCommand}" />
+    </Window.KeyBindings>
     <DockPanel>
         <Border DockPanel.Dock="Top"
                 Background="Transparent"
@@ -28,9 +31,13 @@
                                 Command="{Binding CloseWorkspaceCommand}"
                                 IsVisible="{Binding Explorer.IsWorkspaceOpen}" />
                         <Separator />
-                        <MenuItem Header="_Save"
-                                HotKey="Ctrl+S"
+                        <MenuItem Header="_Save File"
                                 Command="{Binding SaveActiveTabCommand}"
+                                IsVisible="{Binding OpenTabs.Count}"
+                                IsEnabled="{Binding OpenTabs.Count}"/>
+                        <MenuItem Header="_Close File"
+                                Command="{Binding CloseTabCommand}"
+                                CommandParameter="{Binding SelectedTab}"
                                 IsVisible="{Binding OpenTabs.Count}"
                                 IsEnabled="{Binding OpenTabs.Count}"/>
 

@@ -186,7 +186,22 @@ public sealed class WorkspaceService : IWorkspaceService
 
         var parentDirectory = Path.GetDirectoryName(sourcePath)
             ?? throw new UndeterminedParentDirectoryException(sourcePath);
-        var destinationFullPath = Path.Combine(parentDirectory, newName);
+
+        var requestedExtension = Path.GetExtension(newName);
+        string normalizedPath;
+        if (!string.IsNullOrEmpty(requestedExtension))
+        {
+            normalizedPath = newName;
+        }
+        else
+        {
+            var originalExtension = Path.GetExtension(sourcePath);
+            normalizedPath = string.IsNullOrEmpty(originalExtension)
+                ? Path.ChangeExtension(newName, ".md")
+                : Path.ChangeExtension(newName, originalExtension);
+        }
+
+        var destinationFullPath = Path.Combine(parentDirectory, normalizedPath);
 
         return MoveInternalAsync(sourcePath, destinationFullPath, cancellationToken);
     }
@@ -230,7 +245,7 @@ public sealed class WorkspaceService : IWorkspaceService
             // Rebuild the moved subtree so children carry their new paths too.
             var children = BuildTree(destinationFullPath, cancellationToken);
             return new WorkspaceItem(
-                        Name: Path.GetFileName(destinationFullPath), 
+                        Name: Path.GetFileNameWithoutExtension(destinationFullPath), 
                         FullPath: destinationFullPath, 
                         IsDirectory: true, 
                         Children: children);
@@ -238,7 +253,7 @@ public sealed class WorkspaceService : IWorkspaceService
 
         await _fileSystemService.MoveFileAsync(sourcePath, destinationFullPath, cancellationToken);
         return new WorkspaceItem(
-                    Name: Path.GetFileName(destinationFullPath), 
+                    Name: Path.GetFileNameWithoutExtension(destinationFullPath), 
                     FullPath: destinationFullPath, 
                     IsDirectory: false, 
                     Children: Array.Empty<WorkspaceItem>());

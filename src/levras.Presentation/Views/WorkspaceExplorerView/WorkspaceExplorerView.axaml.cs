@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using levras.Presentation.ViewModels;
 
 namespace levras.Presentation.Views;
@@ -37,8 +38,16 @@ public partial class WorkspaceExplorerView : UserControl
     private void OnRenameTextBoxKeyDown(object? sender, KeyEventArgs e)
     {
         if ((sender as TextBox)?.DataContext is not WorkspaceItemViewModel node) return;
-        if (e.Key == Key.Enter) ViewModel.CommitRenameCommand.Execute(node);
-        else if (e.Key == Key.Escape) ViewModel.CancelRenameCommand.Execute(node);
+        if (e.Key == Key.Enter)
+        {
+            ViewModel.CommitRenameCommand.Execute(node);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape) 
+        {
+            ViewModel.CancelRenameCommand.Execute(node);
+            e.Handled = true;
+        }
     }
 
     private void OnRenameTextBoxLostFocus(object? sender, RoutedEventArgs e)
@@ -122,7 +131,7 @@ public partial class WorkspaceExplorerView : UserControl
     private void OnRowPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (_dragCandidate is not null)
-        _dragCandidate = null;
+            _dragCandidate = null;
         _dragPressArgs = null;
         _dragInProgress = false;
     }
@@ -194,7 +203,7 @@ public partial class WorkspaceExplorerView : UserControl
         var canMove = hasSource && ViewModel.CanMoveNode(sourceNode, null);
         if (canMove)
         {
-            ViewModel.MoveNodeCommand.Execute((sourceNode, (WorkspaceItemViewModel?)null));
+            ViewModel.MoveNodeCommand.Execute((sourceNode, null));
         }
     }
 
@@ -210,4 +219,30 @@ public partial class WorkspaceExplorerView : UserControl
         node = null!;
         return false;
     }
+
+    private void OnRenameTextBoxInitialized(object? sender, EventArgs e)
+    {
+        if (sender is not TextBox textBox) return;
+
+        textBox.PropertyChanged += (s, args) =>
+        {
+            if (args.Property == IsVisibleProperty && textBox.IsVisible)
+            {
+                FocusRenameBox(textBox);
+            }
+        };
+        if (textBox.IsVisible)
+        {
+            FocusRenameBox(textBox);
+        }
+    }
+
+    private static void FocusRenameBox(TextBox textBox)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            textBox.Focus();
+            textBox.SelectAll();
+        }, DispatcherPriority.Input);
+}
 }

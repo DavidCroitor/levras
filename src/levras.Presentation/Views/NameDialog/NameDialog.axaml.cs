@@ -7,6 +7,7 @@ public partial class NameDialog : Window
     public NameDialog()
     {
         InitializeComponent();
+        CanResize = false;
     }
 
     public NameDialog(string title, string message, string defaultValue = "New Folder") : this()

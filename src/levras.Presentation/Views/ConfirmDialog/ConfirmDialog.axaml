@@ -7,11 +7,16 @@
         SizeToContent="Height"
         WindowDecorations="None"
         ExtendClientAreaToDecorationsHint="True">
-    <StackPanel Margin="20" Spacing="16">
+    <Grid RowDefinitions="16,*">
+        <Border Grid.Row="0"
+                Background="Transparent"
+                WindowDecorationProperties.ElementRole="TitleBar" />
+    <StackPanel Grid.Row="1" Margin="20" Spacing="16">
         <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button Content="Yes" Classes="dialogPrimary" Click="OnYesClick" />
             <Button x:Name="NoButton" Content="No" Classes="dialogDanger" Click="OnNoClick" />
         </StackPanel>
     </StackPanel>
+    </Grid>
 </Window>
