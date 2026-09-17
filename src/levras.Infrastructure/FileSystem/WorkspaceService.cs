@@ -55,6 +55,20 @@ public sealed class WorkspaceService : IWorkspaceService
         CurrentWorkspacePath = fullPath;
     }
 
+    public async Task<string> CreateWorkspaceAsync(string parentPath, string name, CancellationToken cancellationToken = default)
+    {
+        WorkspaceFileNameValidator.EnsureValid(name);
+        
+        var fullPath = Path.Combine(parentPath, name);
+        if(await _fileSystemService.DirectoryExistsAsync(fullPath) || await _fileSystemService.FileExistsAsync(fullPath))
+        {
+            throw new NodeAlreadyExistsException(fullPath);
+        }
+
+        await _fileSystemService.CreateDirectoryAsync(fullPath);
+        return fullPath;
+
+    }
     public async Task<string> ReadFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         if(!IsPathWithinWorkspace(filePath))
@@ -118,7 +132,11 @@ public sealed class WorkspaceService : IWorkspaceService
         }
         WorkspaceFileNameValidator.EnsureValid(fileName);
 
-        var fullPath = Path.Combine(parentDirectoryPath, fileName);
+        var extension = Path.GetExtension(fileName);
+        var normalizedPath = string.IsNullOrEmpty(extension) 
+                            ? Path.ChangeExtension(fileName, ".md")
+                            : fileName;
+        var fullPath = Path.Combine(parentDirectoryPath, normalizedPath);
         if (await _fileSystemService.FileExistsAsync(fullPath) || await _fileSystemService.DirectoryExistsAsync(fullPath))
         {
             throw new NodeAlreadyExistsException(fullPath);
@@ -142,7 +160,7 @@ public sealed class WorkspaceService : IWorkspaceService
         WorkspaceFileNameValidator.EnsureValid(folderName);
 
         var fullPath = Path.Combine(parentDirectoryPath, folderName);
-        if (await _fileSystemService.FileExistsAsync(fullPath) || await _fileSystemService.DirectoryExistsAsync(fullPath))
+        if(await _fileSystemService.DirectoryExistsAsync(fullPath) || await _fileSystemService.FileExistsAsync(fullPath))
         {
             throw new NodeAlreadyExistsException(fullPath);
         }
@@ -168,7 +186,22 @@ public sealed class WorkspaceService : IWorkspaceService
 
         var parentDirectory = Path.GetDirectoryName(sourcePath)
             ?? throw new UndeterminedParentDirectoryException(sourcePath);
-        var destinationFullPath = Path.Combine(parentDirectory, newName);
+
+        var requestedExtension = Path.GetExtension(newName);
+        string normalizedPath;
+        if (!string.IsNullOrEmpty(requestedExtension))
+        {
+            normalizedPath = newName;
+        }
+        else
+        {
+            var originalExtension = Path.GetExtension(sourcePath);
+            normalizedPath = string.IsNullOrEmpty(originalExtension)
+                ? Path.ChangeExtension(newName, ".md")
+                : Path.ChangeExtension(newName, originalExtension);
+        }
+
+        var destinationFullPath = Path.Combine(parentDirectory, normalizedPath);
 
         return MoveInternalAsync(sourcePath, destinationFullPath, cancellationToken);
     }
@@ -212,7 +245,7 @@ public sealed class WorkspaceService : IWorkspaceService
             // Rebuild the moved subtree so children carry their new paths too.
             var children = BuildTree(destinationFullPath, cancellationToken);
             return new WorkspaceItem(
-                        Name: Path.GetFileName(destinationFullPath), 
+                        Name: Path.GetFileNameWithoutExtension(destinationFullPath), 
                         FullPath: destinationFullPath, 
                         IsDirectory: true, 
                         Children: children);
@@ -220,7 +253,7 @@ public sealed class WorkspaceService : IWorkspaceService
 
         await _fileSystemService.MoveFileAsync(sourcePath, destinationFullPath, cancellationToken);
         return new WorkspaceItem(
-                    Name: Path.GetFileName(destinationFullPath), 
+                    Name: Path.GetFileNameWithoutExtension(destinationFullPath), 
                     FullPath: destinationFullPath, 
                     IsDirectory: false, 
                     Children: Array.Empty<WorkspaceItem>());
@@ -243,7 +276,7 @@ public sealed class WorkspaceService : IWorkspaceService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var name = Path.GetFileName(entryPath);
+            var name = Path.GetFileNameWithoutExtension(entryPath);
             var isDirectory = Directory.Exists(entryPath);
 
             if(isDirectory)
@@ -272,5 +305,6 @@ public sealed class WorkspaceService : IWorkspaceService
         var extension = Path.GetExtension(entryPath);
         return WorkspaceFileTypeClassifier.IsAllowedExtension(extension);
     }
+
 
 }

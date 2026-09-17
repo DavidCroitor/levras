@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="levras.Presentation.Views.NameDialog"
+        Width="380" Height="200"
+        Background="{StaticResource EditorBackgroundBrush}"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="Height"
+        WindowDecorations="None"
+        ExtendClientAreaToDecorationsHint="True">
+    <Grid RowDefinitions="16,*">
+        <Border Grid.Row="0"
+                Background="Transparent"
+                WindowDecorationProperties.ElementRole="TitleBar" />
+        <StackPanel Grid.Row="1" Margin="20" Spacing="16">
+            <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
+            <TextBox x:Name="NameTextBox"
+                    PlaceholderText="Workspace name"
+                    MinWidth="340" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Content="Done" Classes="dialogPrimary" Click="OnDoneClick" />
+                <Button Content="Cancel" Classes="dialogSecondary" Click="OnCancelClick" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,95 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ControlTheme x:Key="{x:Type TabItem}" TargetType="TabItem">
+
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUI}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeDefault}"/>
+        <Setter Property="MaxWidth" Value="160"/>
+
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="PART_LayoutRoot"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource RadiusSmall}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Content="{TemplateBinding Header}"
+                                      ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                      VerticalAlignment="Center"
+                                      Foreground="{TemplateBinding Foreground}"/>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <!-- ^ means "this TabItem"; /template/ reaches inside its own ControlTemplate -->
+        <Style Selector="^:pointerover /template/ Border#PART_LayoutRoot">
+            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+        </Style>
+
+        <Style Selector="^:selected /template/ Border#PART_LayoutRoot">
+            <Setter Property="Background" Value="{StaticResource SurfaceElevatedBrush}"/>
+        </Style>
+
+        <Style Selector="^:selected">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        </Style>
+
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type TabControl}" TargetType="TabControl">
+
+        <Setter Property="Padding" Value="0"/>
+
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </Setter>
+
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel>
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                    DockPanel.Dock="Top"
+                                    Margin="0"
+                                    ItemsPanel="{TemplateBinding ItemsPanel}"/>
+
+                    <ContentPresenter Name="PART_SelectedContentHost"
+                                    Margin="0"
+                                    Content="{TemplateBinding SelectedContent}"
+                                    ContentTemplate="{TemplateBinding SelectedContentTemplate}"/>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type TreeViewItem}" TargetType="TreeViewItem">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontFamilyUI}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeDefault}"/>
+
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel>
+                    <Border Name="PART_LayoutRoot"
+                            Background="Transparent"
+                            CornerRadius="{StaticResource RadiusSmall}">
+                        <ContentPresenter Name="PART_HeaderPresenter"
+                                        Content="{TemplateBinding Header}"
+                                        ContentTemplate="{TemplateBinding HeaderTemplate}"/>
+                    </Border>
+
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                    Margin="0"
+                                    IsVisible="{TemplateBinding IsExpanded}"/>
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+
+    </ControlTheme>
+
+</ResourceDictionary>

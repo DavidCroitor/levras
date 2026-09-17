@@ -7,10 +7,10 @@ public partial class ErrorDialog : Window
     public ErrorDialog()
     {
         InitializeComponent();
+        CanResize = false;
     }
-    public ErrorDialog(string title, string message): this ()
+    public ErrorDialog(string message): this ()
     {
-        Title = title;
         MessageText.Text = message;
     }
 

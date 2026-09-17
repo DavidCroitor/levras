@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -10,15 +11,13 @@ public sealed class DialogService : IDialogService
 {
     public async Task<SaveChangesChoice> ConfirmSaveChangesAsync(string fileName)
     {
-        var owner = GetMainWindow();
+        var owner = GetMainWindow()
+        ?? throw new InvalidOperationException("No owner window available for dialog.");
+
+
         var dialog = new SaveChangesDialog(fileName);
-
-        if(owner is null)
-        {
-            return await dialog.ShowDialog<SaveChangesChoice>(new Window());
-        }
-
-        return await dialog.ShowDialog<SaveChangesChoice>(owner);
+        var result = await dialog.ShowDialog<SaveChangesChoice>(owner);
+        return result;
     }
     public async Task<bool> ConfirmAsync(string title, string message)
     {
@@ -35,7 +34,7 @@ public sealed class DialogService : IDialogService
     public async Task ShowErrorAsync(string message)
     {
         var owner = GetMainWindow();
-        var dialog = new ErrorDialog("Error", message);
+        var dialog = new ErrorDialog(message);
 
         if (owner is null)
         {
@@ -45,10 +44,22 @@ public sealed class DialogService : IDialogService
 
         await dialog.ShowDialog<bool>(owner);
     }
+    public async Task<string?> PromptNameAsync(string title, string message, string defaultValue = "New Folder")
+    {
+        var owner = GetMainWindow();
+        var dialog = new NameDialog(title, message, defaultValue);
+        if(owner is null)
+        {
+            return await dialog.ShowDialog<string?>(new Window());
+        }
+        return await dialog.ShowDialog<string?>(owner);
+    }
 
     private Window? GetMainWindow()
     {
         return Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop 
                 ? desktop.MainWindow : null;
     }
+
+
 }

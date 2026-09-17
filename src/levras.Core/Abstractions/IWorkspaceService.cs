@@ -8,6 +8,10 @@ public interface IWorkspaceService
     void OpenWorkspace(string folderPath);
     Task<IReadOnlyList<WorkspaceItem>> GetWorkspaceTreeAsync(CancellationToken cancellationToken = default);
     bool IsPathWithinWorkspace(string path);
+    Task<string> CreateWorkspaceAsync(
+            string parentPath,
+            string name,
+            CancellationToken cancellationToken = default);
     Task<string> ReadFileAsync(
             string filePath,
             CancellationToken cancellationToken = default);

@@ -15,4 +15,9 @@ public abstract class WorkspaceIoException : Exception
     {
         Path = path;
     }
+    protected static string NameOf(string path)
+    {
+        var trimmedPath = System.IO.Path.TrimEndingDirectorySeparator(path);
+        return System.IO.Path.GetFileName(trimmedPath);
+    }
 }

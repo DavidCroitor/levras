@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:levras.Presentation.ViewModels"
+             x:Class="levras.Presentation.Views.WelcomeView"
+             x:DataType="vm:MainViewModel">
+
+    <Grid Background="{StaticResource EditorBackgroundBrush}">
+        <StackPanel HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" 
+                    MinWidth="300"
+                    Spacing="8">
+            
+            <TextBlock Text="levras" 
+                       FontSize="32" 
+                       FontFamily="{StaticResource FontFamilyUI}"
+                       FontWeight="SemiBold" 
+                       Foreground="{StaticResource TextPrimaryBrush}" 
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,16"/>
+            
+            <Button Content="Open Workspace"
+                    Command="{Binding OpenWorkspaceCommand}"
+                    Foreground="{StaticResource Slate300}" 
+                    Classes="welcomePrimary"/>
+            <Button Content="Create New Workspace"
+                    Command="{Binding CreateNewWorkspaceCommand}"
+                    Foreground="{StaticResource Slate300}" 
+                    Classes="welcomeSecondary"/>
+                    
+            <TextBlock Text="Recent Workspaces" 
+                       FontSize="{StaticResource FontSizeDefault}" 
+                       FontFamily="{StaticResource FontFamilyUI}"
+                       Foreground="{StaticResource TextSecondaryBrush}" 
+                       Margin="0,16,0,0"
+                       HorizontalAlignment="Left"/>
+            
+            <ItemsControl ItemsSource="{Binding RecentWorkspaces}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding}" 
+                                Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).OpenWorkspaceCommand}"
+                                CommandParameter="{Binding}"
+                                Classes="welcomeRecent"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+</UserControl>

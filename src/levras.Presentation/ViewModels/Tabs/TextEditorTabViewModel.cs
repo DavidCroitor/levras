@@ -16,15 +16,15 @@ public partial class TextEditorTabViewModel : TabViewModelBase
     private readonly IWorkspaceService _workspaceService;
     private readonly IDialogService _dialogService;
     public TextDocument Document {get; } = new();
+    public string MarkdownText => Document.Text;
 
-    [ObservableProperty]private bool _isDirty;
     private bool _isLoadingContent;
 
     public TextEditorTabViewModel(
         string filePath,
         IWorkspaceService workspaceService,
         IDialogService dialogService
-    ) : base( filePath, Path.GetFileName(filePath))
+    ) : base( filePath, Path.GetFileNameWithoutExtension(filePath))
     {
         _workspaceService = workspaceService;
         _dialogService = dialogService;
@@ -39,6 +39,7 @@ public partial class TextEditorTabViewModel : TabViewModelBase
             return;
         }
         IsDirty = true;
+        OnPropertyChanged(nameof(MarkdownText));
     }
 
     public async Task LoadFileAsync(CancellationToken cancellationToken = default )

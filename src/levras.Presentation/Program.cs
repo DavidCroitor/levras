@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using System;
+using Avalonia.Wayland;
 
 namespace levras.Presentation;
 
@@ -16,8 +17,14 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .UseWayland()
+            .With(new WaylandPlatformOptions
+                {
+                    ForceDrawnDecorations = true
+                }
+            )
 #if DEBUG
-            .WithDeveloperTools()
+            // .WithDeveloperTools()
 #endif
             .WithInterFont()
             .LogToTrace();
